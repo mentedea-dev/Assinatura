@@ -209,13 +209,15 @@ export default function Home() {
 
   /**
    * Generate the HTML signature with RELATIVE image paths for Outlook _files folder.
+   * Uses full Outlook Word engine compatibility: no border-radius, no text-transform,
+   * explicit widths, MSO namespaces, bgcolor attributes, no <p> margins.
    */
   const genHTMLForOutlook = useCallback((baseName: string) => {
     const photoSize = 60;
     const symbolSize = 44;
     const sz = foto ? photoSize : symbolSize;
     const dn = nome || "[Nome Completo]";
-    const dpt = cargoPT || "[Cargo]";
+    const dpt = (cargoPT || "[Cargo]").toUpperCase(); // Outlook ignores text-transform
     const den = cargoEN || "[Position]";
     const df = fixo || "+55 (XX) XXXX-XXXX";
     const dc = cel || "+55 (XX) XXXXX-XXXX";
@@ -228,32 +230,35 @@ export default function Home() {
     const imgFile = `${baseName}_files/image001.${imgExt}`;
     const wmFile = `${baseName}_files/image002.${wmExt}`;
 
-    const photoHTML = foto
-      ? `<img src="${imgFile}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:1px solid #E7E9EB;" />`
-      : `<img src="${imgFile}" alt="A" width="${symbolSize}" height="${symbolSize}" style="display:block;width:${symbolSize}px;height:${symbolSize}px;border:0;" />`;
+    // No border-radius in Outlook; use simple square image
+    const photoHTML = `<img src="${imgFile}" alt="${foto ? 'Foto' : 'A'}" width="${sz}" height="${sz}" style="display:block;width:${sz}px;height:${sz}px;border:0;" />`;
 
     const parts = [
-      `<html><head><meta charset="utf-8"><title>Assinatura</title></head><body>`,
-      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,Helvetica,sans-serif;max-width:520px;border:none;">`,
-      `<tr><td colspan="3" style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;border-left:none;border-right:none;border-bottom:none;">&nbsp;</td></tr>`,
+      `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:m="http://schemas.microsoft.com/office/2004/12/omml" xmlns="http://www.w3.org/TR/REC-html40">`,
+      `<head><meta charset="utf-8"><meta name="Generator" content="Microsoft Word 15">`,
+      `<!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]-->`,
+      `<title>Assinatura</title></head>`,
+      `<body style="margin:0;padding:0;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;font-family:Calibri,Arial,Helvetica,sans-serif;width:520px;">`,
+      `<tr><td colspan="3" height="10" style="padding:0;font-size:1px;line-height:1px;border-top:1px solid #E7E9EB;">&nbsp;</td></tr>`,
       `<tr>`,
-      `<td valign="top" style="padding:0;width:${sz}px;border:none;">${photoHTML}</td>`,
-      `<td valign="top" style="padding:0 12px;width:2px;border:none;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;"><tr><td style="background-color:#E67E22;width:2px;height:${sz}px;font-size:1px;line-height:1px;border:none;">&nbsp;</td></tr></table></td>`,
-      `<td valign="top" style="padding:0;border:none;">`,
-      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;">`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;border:none;mso-line-height-rule:exactly;">${dn}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:600;color:#E67E22;line-height:13px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.5px;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">T</strong>&nbsp;&nbsp;${df}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
+      `<td valign="top" width="${sz}" style="padding:0;width:${sz}px;">${photoHTML}</td>`,
+      `<td valign="top" width="26" style="padding:0;width:26px;"><table cellpadding="0" cellspacing="0" border="0" width="26" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td width="12" style="width:12px;font-size:1px;">&nbsp;</td><td width="2" bgcolor="#E67E22" style="width:2px;font-size:1px;line-height:${sz}px;">&nbsp;</td><td width="12" style="width:12px;font-size:1px;">&nbsp;</td></tr></table></td>`,
+      `<td valign="top" style="padding:0;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;mso-line-height-rule:exactly;">${dn}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#E67E22;line-height:13px;padding:0;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">T</strong>&nbsp;&nbsp;${df}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
-      `<tr><td colspan="3" style="padding:10px 0 0 0;border:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
-      `<tr><td colspan="3" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmFile}" alt="Assistants Consulting" width="100" style="display:block;border:0;width:100px;height:auto;" /></a></td></tr>`,
-      `<tr><td colspan="3" style="padding:8px 0 0 0;border-top:1px solid #E7E9EB;border-left:none;border-right:none;border-bottom:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
-      `<tr><td colspan="3" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:0;line-height:12px;mso-line-height-rule:exactly;"><strong>S\u00e3o Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</p><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:2px 0 0 0;line-height:12px;mso-line-height-rule:exactly;"><strong>Bras\u00edlia</strong>&nbsp;&nbsp;${ENDERECO_BSB}</p></td></tr>`,
-      `<tr><td colspan="3" style="padding:10px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;mso-line-height-rule:exactly;">${AVISO_PT}</p></td></tr>`,
-      `<tr><td colspan="3" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;font-style:italic;mso-line-height-rule:exactly;">${AVISO_EN}</p></td></tr>`,
+      `<tr><td colspan="3" height="10" style="padding:0;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
+      `<tr><td colspan="3" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmFile}" alt="Assistants Consulting" width="100" height="22" style="display:block;border:0;width:100px;height:22px;" /></a></td></tr>`,
+      `<tr><td colspan="3" height="8" style="padding:0;font-size:1px;line-height:1px;border-top:1px solid #E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="3" style="padding:4px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><strong>S\u00e3o Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;padding:2px 0 0 0;mso-line-height-rule:exactly;"><strong>Bras\u00edlia</strong>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
+      `<tr><td colspan="3" style="padding:10px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr></table></td></tr>`,
+      `<tr><td colspan="3" style="padding:4px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;font-style:italic;mso-line-height-rule:exactly;width:520px;">${AVISO_EN}</td></tr></table></td></tr>`,
       `</table>`,
       `</body></html>`,
     ];

@@ -30,3 +30,4 @@
 - [x] Remover botão "Copiar assinatura" e código associado (handleCopy, estado copied, toast)
 - [x] Gerar pacote ZIP com arquivo .htm + pasta _files contendo imagens (formato Outlook para assinaturas)
 - [x] Atualizar guia "Como usar" com instruções detalhadas do Outlook clássico para Windows (Win+R, %APPDATA%\Microsoft\Signatures, copiar .htm e _files, Arquivo > Opções > Email > Assinaturas, selecionar como padrão)
+- [x] BUG CRÍTICO: Assinatura desconfigurada no Outlook — corrigido: HTML reescrito com MSO namespaces, bgcolor, explicit widths, .toUpperCase() em vez de text-transform, sem border-radius
