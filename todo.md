@@ -23,3 +23,4 @@
 - [x] BUG: Assinatura - falta barra vertical laranja entre foto e dados — 2px #E67E22
 - [x] MELHORIA: Assinatura - tornar mais compacta e proporcional (referência McKinsey/Bain)
 - [x] BUG CRÍTICO: Assinatura colada no Outlook exibe bordas de tabela visíveis e espaçamento irregular — corrigido com border=0 + imagens Base64 inline + Clipboard API
+- [ ] BUG: Botões Copiar e Baixar HTML não funcionam na versão publicada
