@@ -14,8 +14,9 @@ import { trpc } from "@/lib/trpc";
 import { SIG_SYMBOL_B64, SIG_WORDMARK_B64 } from "@shared/signatureAssets";
 import {
   Upload, User, Mail, Phone, Briefcase,
-  Download, Image, Smartphone, Loader2,
+  Download, Image, Smartphone, Loader2, FolderArchive,
 } from "lucide-react";
+import JSZip from "jszip";
 
 /* Display-only URLs for the web UI (header logo, preview fallback) */
 const WORDMARK_URL = "/manus-storage/Assistants_FINAL_Wordmark_d3b4a1a8.png";
@@ -135,9 +136,27 @@ export default function Home() {
   }, []);
 
   /**
-   * Generate the HTML signature with BASE64 INLINE images.
-   * This ensures the signature works when pasted into Outlook without external URLs.
-   * MUST be defined BEFORE handleCopy and handleDL.
+   * Helper: convert a data:image/...;base64,... string to a Uint8Array of raw bytes.
+   */
+  const base64ToBytes = useCallback((dataUrl: string): Uint8Array => {
+    const base64 = dataUrl.split(",")[1] || "";
+    const bin = atob(base64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }, []);
+
+  /**
+   * Helper: extract the MIME extension from a data URL (e.g., "png", "jpeg").
+   */
+  const mimeExt = useCallback((dataUrl: string): string => {
+    const m = dataUrl.match(/^data:image\/(\w+);/);
+    return m ? m[1] : "png";
+  }, []);
+
+  /**
+   * Generate the HTML signature with BASE64 INLINE images (for preview / simple download).
+   * MUST be defined BEFORE handleDL.
    */
   const genHTML = useCallback(() => {
     const photoSize = 60;
@@ -188,17 +207,118 @@ export default function Home() {
   }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto, symbolB64, wordmarkB64]);
 
 
-  const handleDL = useCallback(() => {
-    const html = genHTML();
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Assinatura_${nome.replace(/\s+/g, "_") || "Assistants"}.htm`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("HTML baixado.");
-  }, [genHTML, nome]);
+  /**
+   * Generate the HTML signature with RELATIVE image paths for Outlook _files folder.
+   */
+  const genHTMLForOutlook = useCallback((baseName: string) => {
+    const photoSize = 60;
+    const symbolSize = 44;
+    const sz = foto ? photoSize : symbolSize;
+    const dn = nome || "[Nome Completo]";
+    const dpt = cargoPT || "[Cargo]";
+    const den = cargoEN || "[Position]";
+    const df = fixo || "+55 (XX) XXXX-XXXX";
+    const dc = cel || "+55 (XX) XXXXX-XXXX";
+    const de = fullEmail || "nome@assistants.com.br";
+
+    const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
+    const imgExt = mimeExt(imgSrc);
+    const wmExt = mimeExt(wordmarkB64);
+
+    const imgFile = `${baseName}_files/image001.${imgExt}`;
+    const wmFile = `${baseName}_files/image002.${wmExt}`;
+
+    const photoHTML = foto
+      ? `<img src="${imgFile}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:1px solid #E7E9EB;" />`
+      : `<img src="${imgFile}" alt="A" width="${symbolSize}" height="${symbolSize}" style="display:block;width:${symbolSize}px;height:${symbolSize}px;border:0;" />`;
+
+    const parts = [
+      `<html><head><meta charset="utf-8"><title>Assinatura</title></head><body>`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,Helvetica,sans-serif;max-width:520px;border:none;">`,
+      `<tr><td colspan="3" style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;border-left:none;border-right:none;border-bottom:none;">&nbsp;</td></tr>`,
+      `<tr>`,
+      `<td valign="top" style="padding:0;width:${sz}px;border:none;">${photoHTML}</td>`,
+      `<td valign="top" style="padding:0 12px;width:2px;border:none;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;"><tr><td style="background-color:#E67E22;width:2px;height:${sz}px;font-size:1px;line-height:1px;border:none;">&nbsp;</td></tr></table></td>`,
+      `<td valign="top" style="padding:0;border:none;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;">`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;border:none;mso-line-height-rule:exactly;">${dn}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:600;color:#E67E22;line-height:13px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.5px;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">T</strong>&nbsp;&nbsp;${df}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
+      `</table></td></tr>`,
+      `<tr><td colspan="3" style="padding:10px 0 0 0;border:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
+      `<tr><td colspan="3" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmFile}" alt="Assistants Consulting" width="100" style="display:block;border:0;width:100px;height:auto;" /></a></td></tr>`,
+      `<tr><td colspan="3" style="padding:8px 0 0 0;border-top:1px solid #E7E9EB;border-left:none;border-right:none;border-bottom:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
+      `<tr><td colspan="3" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:0;line-height:12px;mso-line-height-rule:exactly;"><strong>S\u00e3o Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</p><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:2px 0 0 0;line-height:12px;mso-line-height-rule:exactly;"><strong>Bras\u00edlia</strong>&nbsp;&nbsp;${ENDERECO_BSB}</p></td></tr>`,
+      `<tr><td colspan="3" style="padding:10px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;mso-line-height-rule:exactly;">${AVISO_PT}</p></td></tr>`,
+      `<tr><td colspan="3" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;font-style:italic;mso-line-height-rule:exactly;">${AVISO_EN}</p></td></tr>`,
+      `</table>`,
+      `</body></html>`,
+    ];
+    return { html: parts.join(''), imgExt, wmExt };
+  }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto, symbolB64, wordmarkB64, mimeExt]);
+
+  /**
+   * Generate plain-text version of the signature.
+   */
+  const genTXT = useCallback(() => {
+    const dn = nome || "[Nome Completo]";
+    const dpt = cargoPT || "[Cargo]";
+    const den = cargoEN || "[Position]";
+    const df = fixo || "+55 (XX) XXXX-XXXX";
+    const dc = cel || "+55 (XX) XXXXX-XXXX";
+    const de = fullEmail || "nome@assistants.com.br";
+    return [
+      `${dn}`,
+      `${dpt}`,
+      `${den}`,
+      `T  ${df}`,
+      `M  ${dc}`,
+      `E  ${de}`,
+      ``,
+      `ASSISTANTS`,
+      `www.assistants.com.br`,
+      ``,
+      `S\u00e3o Paulo  ${ENDERECO_SP}`,
+      `Bras\u00edlia  ${ENDERECO_BSB}`,
+    ].join('\n');
+  }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail]);
+
+  /**
+   * Download: generate a ZIP file with .htm + _files/ folder + .txt (Outlook signature format).
+   */
+  const handleDL = useCallback(async () => {
+    try {
+      const baseName = `Assinatura_${nome.replace(/\s+/g, "_") || "Assistants"}`;
+      const { html, imgExt, wmExt } = genHTMLForOutlook(baseName);
+      const txt = genTXT();
+
+      const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
+      const imgBytes = base64ToBytes(imgSrc);
+      const wmBytes = base64ToBytes(wordmarkB64);
+
+      const zip = new JSZip();
+      zip.file(`${baseName}.htm`, html);
+      zip.file(`${baseName}.txt`, txt);
+      const filesFolder = zip.folder(`${baseName}_files`)!;
+      filesFolder.file(`image001.${imgExt}`, imgBytes);
+      filesFolder.file(`image002.${wmExt}`, wmBytes);
+
+      const content = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${baseName}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Pacote de assinatura baixado.");
+    } catch (err) {
+      console.error("ZIP generation error:", err);
+      toast.error("Erro ao gerar o pacote. Tente novamente.");
+    }
+  }, [genHTMLForOutlook, genTXT, nome, foto, fotoUrl, symbolB64, wordmarkB64, base64ToBytes]);
 
   // Validation
   const fixoValid = fixoRaw.length === 0 || (isComplete(fixoRaw, false) && isDDDOk(fixoRaw));
@@ -354,7 +474,7 @@ export default function Home() {
             {/* Button */}
             <div className="flex gap-3">
               <Button onClick={handleDL} disabled={!phonesOk} className="flex-1 h-12 bg-[#0B1929] hover:bg-[#162a40] text-white font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                <Download className="w-4 h-4 mr-2" /> Baixar HTML
+                <FolderArchive className="w-4 h-4 mr-2" /> Baixar pacote de assinatura (.zip)
               </Button>
             </div>
 
@@ -369,10 +489,10 @@ export default function Home() {
               <h3 className="text-xs font-semibold text-[#0B1929] uppercase tracking-wider mb-2">Como usar</h3>
               <ol className="text-xs text-[#3D4F5F] space-y-1.5 list-decimal list-inside leading-relaxed">
                 <li>Preencha todos os campos ao lado</li>
-                <li>Clique em <strong>"Baixar HTML"</strong></li>
-                <li>No Outlook, vá em <strong>Configurações &gt; Email &gt; Assinaturas</strong></li>
-                <li>Abra o arquivo <strong>.htm</strong> baixado, selecione tudo (<strong>Ctrl+A</strong>) e copie (<strong>Ctrl+C</strong>)</li>
-                <li>Cole com <strong>Ctrl+V</strong> na caixa de assinatura</li>
+                <li>Clique em <strong>"Baixar pacote de assinatura"</strong></li>
+                <li>Extraia o arquivo <strong>.zip</strong> baixado</li>
+                <li>Copie o arquivo <strong>.htm</strong> e a pasta <strong>_files</strong> para <strong>%AppData%\Microsoft\Signatures\</strong></li>
+                <li>No Outlook, vá em <strong>Configurações &gt; Email &gt; Assinaturas</strong> e selecione a assinatura</li>
                 <li>Salve e pronto!</li>
               </ol>
             </div>
