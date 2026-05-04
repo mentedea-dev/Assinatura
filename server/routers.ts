@@ -4,6 +4,9 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { invokeLLM } from "./_core/llm";
 import { z } from "zod";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 export const appRouter = router({
   system: systemRouter,
@@ -15,6 +18,22 @@ export const appRouter = router({
       return {
         success: true,
       } as const;
+    }),
+  }),
+
+  assets: router({
+    signatureImages: publicProcedure.query(() => {
+      // Read pre-generated base64 images for email signature
+      // Use inline base64 so they work in any deployment environment
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      const assetsDir = path.join(__dirname, "assets");
+      const symbolB64 = fs.readFileSync(path.join(assetsDir, "sig_symbol_b64.txt"), "utf-8").trim();
+      const wordmarkB64 = fs.readFileSync(path.join(assetsDir, "sig_wordmark_b64.txt"), "utf-8").trim();
+      return {
+        symbolB64: `data:image/png;base64,${symbolB64}`,
+        wordmarkB64: `data:image/png;base64,${wordmarkB64}`,
+      };
     }),
   }),
 

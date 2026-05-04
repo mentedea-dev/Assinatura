@@ -1,6 +1,6 @@
 /**
- * Assistants Consulting — Gerador de Assinatura de E-mail v4
- * Redesign: compacta, proporcional, foto circular com VML fallback para Outlook
+ * Assistants Consulting — Gerador de Assinatura de E-mail v5
+ * Base64 inline images for full Outlook compatibility
  */
 
 import { useState, useRef, useCallback, useEffect } from "react";
@@ -16,6 +16,7 @@ import {
   Download, Image, Smartphone, Loader2,
 } from "lucide-react";
 
+/* Display-only URLs for the web UI (header logo, preview fallback) */
 const WORDMARK_URL = "/manus-storage/Assistants_FINAL_Wordmark_d3b4a1a8.png";
 const SYMBOL_URL = "/manus-storage/sig_symbol_478d8f65.png";
 const SIG_WORDMARK_URL = "/manus-storage/sig_wordmark_daf02010.png";
@@ -40,9 +41,7 @@ const VALID_DDDS = new Set([
 
 const EMAIL_DOMAIN = "@assistants.com.br";
 
-function digitsOnly(v: string): string {
-  return v.replace(/\D/g, "");
-}
+function digitsOnly(v: string): string { return v.replace(/\D/g, ""); }
 
 function fmtPhone(raw: string, mobile: boolean): string {
   const d = raw.slice(0, mobile ? 11 : 10);
@@ -81,6 +80,11 @@ export default function Home() {
   const fileRef = useRef<HTMLInputElement>(null);
   const prevRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Fetch base64 images from server for embedding in HTML
+  const { data: imgData } = trpc.assets.signatureImages.useQuery();
+  const symbolB64 = imgData?.symbolB64 || "";
+  const wordmarkB64 = imgData?.wordmarkB64 || "";
 
   const fixo = fmtPhone(fixoRaw, false);
   const cel = fmtPhone(celRaw, true);
@@ -130,29 +134,10 @@ export default function Home() {
     r.readAsDataURL(f);
   }, []);
 
-  const handleCopy = useCallback(async () => {
-    if (!prevRef.current) return;
-    try {
-      const range = document.createRange();
-      range.selectNodeContents(prevRef.current);
-      const sel = window.getSelection();
-      sel?.removeAllRanges(); sel?.addRange(range);
-      document.execCommand("copy");
-      sel?.removeAllRanges();
-      setCopied(true);
-      toast.success("Assinatura copiada! Cole no Outlook com Ctrl+V.");
-      setTimeout(() => setCopied(false), 3000);
-    } catch { toast.error("Erro ao copiar."); }
-  }, []);
-
   /**
-   * Generate the HTML signature for download.
-   * Key design decisions:
-   * - Photo: 60x60 circular using VML for Outlook + CSS border-radius for modern clients
-   * - Vertical orange bar: 2px wide, same height as photo/symbol
-   * - Wordmark: 90px (compact, not oversized)
-   * - Tight spacing throughout
-   * - Disclaimer in very light grey, small font
+   * Generate the HTML signature with BASE64 INLINE images.
+   * This ensures the signature works when pasted into Outlook without external URLs.
+   * MUST be defined BEFORE handleCopy and handleDL.
    */
   const genHTML = useCallback(() => {
     const photoSize = 60;
@@ -164,39 +149,84 @@ export default function Home() {
     const df = fixo || "+55 (XX) XXXX-XXXX";
     const dc = cel || "+55 (XX) XXXXX-XXXX";
     const de = fullEmail || "nome@assistants.com.br";
-    const src = foto && fotoUrl ? fotoUrl : SYMBOL_URL;
 
-    // For photo: VML roundrect for Outlook, CSS border-radius for others
+    // For the photo: use the uploaded base64 photo, or the symbol base64
+    const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
+    // Wordmark: always base64
+    const wmSrc = wordmarkB64;
+
+    // Photo HTML: circular for photo, square for symbol
     const photoHTML = foto
-      ? `<!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" style="height:${photoSize}px;width:${photoSize}px;v-text-anchor:middle;" arcsize="50%" strokecolor="#E7E9EB" strokeweight="1px" fillcolor="#F4F5F7"><v:fill type="frame" src="${src}" /><w:anchorlock/></v:roundrect><![endif]--><!--[if !mso]><!--><img src="${src}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;object-fit:cover;border:1px solid #E7E9EB;" /><!--<![endif]-->`
-      : `<img src="${src}" alt="A" width="${symbolSize}" height="${symbolSize}" style="display:block;width:${symbolSize}px;height:${symbolSize}px;border:0;" />`;
+      ? `<img src="${imgSrc}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:1px solid #E7E9EB;" />`
+      : `<img src="${imgSrc}" alt="A" width="${symbolSize}" height="${symbolSize}" style="display:block;width:${symbolSize}px;height:${symbolSize}px;border:0;" />`;
 
-    return `<!DOCTYPE html><html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="pt-BR"><head><meta charset="UTF-8"><meta name="color-scheme" content="light"><!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]--></head><body style="margin:0;padding:0;background:#fff;">
-<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,sans-serif;max-width:520px;">
-<tr><td style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;">&nbsp;</td><td style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;">&nbsp;</td><td style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+    return `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,Helvetica,sans-serif;max-width:520px;border:none;">
+<tr><td colspan="3" style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;border-left:none;border-right:none;border-bottom:none;">&nbsp;</td></tr>
 <tr>
-<td style="vertical-align:top;padding:0;width:${sz}px;">${photoHTML}</td>
-<td style="vertical-align:top;padding:0 12px;width:2px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background-color:#E67E22;width:2px;height:${sz}px;font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td>
-<td style="vertical-align:top;padding:0;">
-<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:13px;font-weight:700;color:#0B1929;line-height:16px;padding:0 0 1px 0;mso-line-height-rule:exactly;">${dn}</td></tr>
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:9px;font-weight:600;color:#E67E22;line-height:12px;padding:0;text-transform:uppercase;letter-spacing:0.5px;mso-line-height-rule:exactly;">${dpt}</td></tr>
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:8.5px;font-weight:400;color:#6B7B8D;line-height:11px;padding:0 0 5px 0;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:9.5px;color:#3D4F5F;line-height:15px;padding:0;mso-line-height-rule:exactly;"><span style="color:#0B1929;font-weight:600;">T</span>&nbsp;&nbsp;${df}</td></tr>
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:9.5px;color:#3D4F5F;line-height:15px;padding:0;mso-line-height-rule:exactly;"><span style="color:#0B1929;font-weight:600;">M</span>&nbsp;&nbsp;${dc}</td></tr>
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:9.5px;color:#3D4F5F;line-height:15px;padding:0;mso-line-height-rule:exactly;"><span style="color:#0B1929;font-weight:600;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>
+<td valign="top" style="padding:0;width:${sz}px;border:none;">${photoHTML}</td>
+<td valign="top" style="padding:0 12px;width:2px;border:none;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;"><tr><td style="background-color:#E67E22;width:2px;height:${sz}px;font-size:1px;line-height:1px;border:none;">&nbsp;</td></tr></table></td>
+<td valign="top" style="padding:0;border:none;">
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;">
+<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;border:none;mso-line-height-rule:exactly;">${dn}</td></tr>
+<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:600;color:#E67E22;line-height:13px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.5px;mso-line-height-rule:exactly;">${dpt}</td></tr>
+<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>
+<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">T</strong>&nbsp;&nbsp;${df}</td></tr>
+<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>
+<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>
 </table></td></tr>
-<tr><td colspan="3" style="padding:8px 0 0 0;font-size:1px;line-height:1px;">&nbsp;</td></tr>
-<tr><td colspan="3" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${SIG_WORDMARK_URL}" alt="Assistants Consulting" width="90" style="display:block;border:0;width:90px;height:auto;" /></a></td></tr>
-<tr><td colspan="3" style="padding:6px 0 0 0;border-bottom:1px solid #E7E9EB;font-size:1px;line-height:1px;">&nbsp;</td></tr>
-<tr><td colspan="3" style="padding:6px 0 0 0;">
-<p style="font-family:Calibri,Arial,sans-serif;font-size:7.5px;color:#6B7B8D;margin:0;line-height:11px;mso-line-height-rule:exactly;"><span style="font-weight:600;">São Paulo</span>&nbsp;&nbsp;${ENDERECO_SP}</p>
-<p style="font-family:Calibri,Arial,sans-serif;font-size:7.5px;color:#6B7B8D;margin:1px 0 0 0;line-height:11px;mso-line-height-rule:exactly;"><span style="font-weight:600;">Brasília</span>&nbsp;&nbsp;${ENDERECO_BSB}</p>
+<tr><td colspan="3" style="padding:10px 0 0 0;border:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+<tr><td colspan="3" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="100" style="display:block;border:0;width:100px;height:auto;" /></a></td></tr>
+<tr><td colspan="3" style="padding:8px 0 0 0;border-top:1px solid #E7E9EB;border-left:none;border-right:none;border-bottom:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+<tr><td colspan="3" style="padding:4px 0 0 0;border:none;">
+<p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:0;line-height:12px;mso-line-height-rule:exactly;"><strong>São Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</p>
+<p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:2px 0 0 0;line-height:12px;mso-line-height-rule:exactly;"><strong>Brasília</strong>&nbsp;&nbsp;${ENDERECO_BSB}</p>
 </td></tr>
-<tr><td colspan="3" style="padding:8px 0 0 0;"><p style="font-family:Calibri,Arial,sans-serif;font-size:7px;color:#C8CDD3;margin:0;line-height:9.5px;max-width:520px;mso-line-height-rule:exactly;">${AVISO_PT}</p></td></tr>
-<tr><td colspan="3" style="padding:4px 0 0 0;"><p style="font-family:Calibri,Arial,sans-serif;font-size:7px;color:#C8CDD3;margin:0;line-height:9.5px;max-width:520px;font-style:italic;mso-line-height-rule:exactly;">${AVISO_EN}</p></td></tr>
-</table></body></html>`;
-  }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto]);
+<tr><td colspan="3" style="padding:10px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;mso-line-height-rule:exactly;">${AVISO_PT}</p></td></tr>
+<tr><td colspan="3" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;font-style:italic;mso-line-height-rule:exactly;">${AVISO_EN}</p></td></tr>
+</table>`;
+  }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto, symbolB64, wordmarkB64]);
+
+  /** Copy: write the generated HTML to clipboard so Outlook receives clean HTML with base64 images */
+  const handleCopy = useCallback(async () => {
+    if (!symbolB64 || !wordmarkB64) {
+      toast.error("Aguarde o carregamento das imagens...");
+      return;
+    }
+    try {
+      const html = genHTML();
+      const blob = new Blob([html], { type: "text/html" });
+      const plainBlob = new Blob([html], { type: "text/plain" });
+      await navigator.clipboard.write([
+        new ClipboardItem({ "text/html": blob, "text/plain": plainBlob }),
+      ]);
+      setCopied(true);
+      toast.success("Assinatura copiada! Cole no Outlook com Ctrl+V.");
+      setTimeout(() => setCopied(false), 3000);
+    } catch {
+      // Fallback: create a hidden div with the HTML and use execCommand
+      try {
+        const html = genHTML();
+        const tmp = document.createElement("div");
+        tmp.innerHTML = html;
+        tmp.style.position = "fixed";
+        tmp.style.left = "-9999px";
+        document.body.appendChild(tmp);
+        const range = document.createRange();
+        range.selectNodeContents(tmp);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        document.execCommand("copy");
+        sel?.removeAllRanges();
+        document.body.removeChild(tmp);
+        setCopied(true);
+        toast.success("Assinatura copiada! Cole no Outlook com Ctrl+V.");
+        setTimeout(() => setCopied(false), 3000);
+      } catch {
+        toast.error("Erro ao copiar. Tente 'Baixar HTML' e cole manualmente.");
+      }
+    }
+  }, [genHTML, symbolB64, wordmarkB64]);
 
   const handleDL = useCallback(() => {
     const html = genHTML();
@@ -280,12 +310,8 @@ export default function Home() {
                   <Phone className="w-3.5 h-3.5" /> Telefone fixo
                 </Label>
                 <Input
-                  id="fixo"
-                  placeholder="1135000000"
-                  value={fixoRaw}
-                  onChange={onFixo}
-                  inputMode="numeric"
-                  maxLength={10}
+                  id="fixo" placeholder="1135000000" value={fixoRaw} onChange={onFixo}
+                  inputMode="numeric" maxLength={10}
                   className={`h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1] font-mono ${fixoErr ? "border-red-400 focus:border-red-400" : ""}`}
                 />
                 <div className="flex items-center justify-between">
@@ -303,12 +329,8 @@ export default function Home() {
                   <Smartphone className="w-3.5 h-3.5" /> Celular
                 </Label>
                 <Input
-                  id="cel"
-                  placeholder="11999990000"
-                  value={celRaw}
-                  onChange={onCel}
-                  inputMode="numeric"
-                  maxLength={11}
+                  id="cel" placeholder="11999990000" value={celRaw} onChange={onCel}
+                  inputMode="numeric" maxLength={11}
                   className={`h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1] font-mono ${celErr ? "border-red-400 focus:border-red-400" : ""}`}
                 />
                 <div className="flex items-center justify-between">
@@ -327,20 +349,15 @@ export default function Home() {
                 </Label>
                 <div className="flex items-center h-11 rounded-md border border-[#E7E9EB] focus-within:border-[#E67E22] focus-within:ring-1 focus-within:ring-[#E67E22]/20 overflow-hidden bg-white">
                   <input
-                    id="emailUser"
-                    type="text"
-                    placeholder="maria.silva"
-                    value={emailUser}
-                    onChange={onEmailUser}
+                    id="emailUser" type="text" placeholder="maria.silva"
+                    value={emailUser} onChange={onEmailUser}
                     className="flex-1 h-full px-3 text-sm text-[#0B1929] placeholder:text-[#B0B8C1] outline-none border-none bg-transparent"
                   />
                   <span className="px-3 text-sm text-[#3D4F5F] bg-[#F4F5F7] h-full flex items-center border-l border-[#E7E9EB] font-medium select-none whitespace-nowrap">
                     {EMAIL_DOMAIN}
                   </span>
                 </div>
-                {emailUser && (
-                  <span className="text-[10px] text-[#B0B8C1]">Resultado: {fullEmail}</span>
-                )}
+                {emailUser && <span className="text-[10px] text-[#B0B8C1]">Resultado: {fullEmail}</span>}
               </div>
 
               <Separator className="bg-[#E7E9EB]" />
@@ -376,10 +393,10 @@ export default function Home() {
 
             {/* Buttons */}
             <div className="flex gap-3">
-              <Button onClick={handleCopy} disabled={!phonesOk} className="flex-1 h-12 bg-[#0B1929] hover:bg-[#162a40] text-white font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button onClick={handleCopy} disabled={!phonesOk || !symbolB64} className="flex-1 h-12 bg-[#0B1929] hover:bg-[#162a40] text-white font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                 {copied ? (<><Check className="w-4 h-4 mr-2" /> Copiado!</>) : (<><Copy className="w-4 h-4 mr-2" /> Copiar assinatura</>)}
               </Button>
-              <Button variant="outline" onClick={handleDL} disabled={!phonesOk} className="h-12 px-5 border-[#E7E9EB] text-[#3D4F5F] hover:border-[#0B1929] hover:text-[#0B1929] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button variant="outline" onClick={handleDL} disabled={!phonesOk || !symbolB64} className="h-12 px-5 border-[#E7E9EB] text-[#3D4F5F] hover:border-[#0B1929] hover:text-[#0B1929] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 <Download className="w-4 h-4 mr-2" /> Baixar HTML
               </Button>
             </div>
@@ -435,50 +452,44 @@ export default function Home() {
                   <p className="text-sm text-[#3D4F5F]">Atenciosamente,</p>
                 </div>
 
-                {/* SIGNATURE PREVIEW */}
+                {/* SIGNATURE PREVIEW — uses the same structure as genHTML but with React JSX */}
                 <div ref={prevRef}>
-                  <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", fontFamily: "Calibri, Arial, Helvetica, sans-serif", maxWidth: 520 }}>
+                  <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", fontFamily: "Calibri, Arial, Helvetica, sans-serif", maxWidth: 520, border: "none" }}>
                     <tbody>
-                      {/* Top separator */}
-                      <tr><td colSpan={3} style={{ padding: "0 0 10px 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px" }}>&nbsp;</td></tr>
-                      {/* Main row: photo | orange bar | info */}
+                      <tr><td colSpan={3} style={{ padding: "0 0 10px 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px", borderLeft: "none", borderRight: "none", borderBottom: "none" }}>&nbsp;</td></tr>
                       <tr>
-                        <td style={{ verticalAlign: "top", padding: 0, width: foto ? 60 : 44 }}>
+                        <td style={{ verticalAlign: "top", padding: 0, width: foto ? 60 : 44, border: "none" }}>
                           {foto && fotoUrl ? (
                             <img src={fotoUrl} alt="Foto" width={60} height={60} style={{ display: "block", border: "1px solid #E7E9EB", width: 60, height: 60, borderRadius: "50%", objectFit: "cover" }} />
                           ) : (
-                            <img src={SYMBOL_URL} alt="A" width={44} height={44} style={{ display: "block", border: 0, width: 44, height: 44 }} />
+                            <img src={symbolB64 || SYMBOL_URL} alt="A" width={44} height={44} style={{ display: "block", border: 0, width: 44, height: 44 }} />
                           )}
                         </td>
-                        <td style={{ verticalAlign: "top", padding: "0 12px", width: 2 }}>
-                          <table cellPadding={0} cellSpacing={0}><tbody><tr><td style={{ backgroundColor: "#E67E22", width: 2, height: foto ? 60 : 44, fontSize: 1, lineHeight: "1px" }}>&nbsp;</td></tr></tbody></table>
+                        <td style={{ verticalAlign: "top", padding: "0 12px", width: 2, border: "none" }}>
+                          <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", border: "none" }}><tbody><tr><td style={{ backgroundColor: "#E67E22", width: 2, height: foto ? 60 : 44, fontSize: 1, lineHeight: "1px", border: "none" }}>&nbsp;</td></tr></tbody></table>
                         </td>
-                        <td style={{ verticalAlign: "top", padding: 0 }}>
-                          <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse" }}>
+                        <td style={{ verticalAlign: "top", padding: 0, border: "none" }}>
+                          <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", border: "none" }}>
                             <tbody>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 13, fontWeight: 700, color: "#0B1929", lineHeight: "16px", padding: "0 0 1px 0" }}>{dNome}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 9, fontWeight: 600, color: "#E67E22", lineHeight: "12px", padding: 0, textTransform: "uppercase", letterSpacing: "0.5px" }}>{dPT}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 8.5, fontWeight: 400, color: "#6B7B8D", lineHeight: "11px", padding: "0 0 5px 0", fontStyle: "italic" }}>{translating ? "Translating..." : dEN}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 9.5, color: "#3D4F5F", lineHeight: "15px", padding: 0 }}><span style={{ color: "#0B1929", fontWeight: 600 }}>T</span>&nbsp;&nbsp;{dFixo}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 9.5, color: "#3D4F5F", lineHeight: "15px", padding: 0 }}><span style={{ color: "#0B1929", fontWeight: 600 }}>M</span>&nbsp;&nbsp;{dCel}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 9.5, color: "#3D4F5F", lineHeight: "15px", padding: 0 }}><span style={{ color: "#0B1929", fontWeight: 600 }}>E</span>&nbsp;&nbsp;<a href={`mailto:${dEmail}`} style={{ color: "#E67E22", textDecoration: "none" }}>{dEmail}</a></td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 14, fontWeight: 700, color: "#0B1929", lineHeight: "18px", padding: "0 0 1px 0", border: "none" }}>{dNome}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 10, fontWeight: 600, color: "#E67E22", lineHeight: "13px", padding: 0, textTransform: "uppercase", letterSpacing: "0.5px", border: "none" }}>{dPT}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 10, fontWeight: 400, color: "#6B7B8D", lineHeight: "13px", padding: "0 0 6px 0", fontStyle: "italic", border: "none" }}>{translating ? "Translating..." : dEN}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><strong style={{ color: "#0B1929" }}>T</strong>&nbsp;&nbsp;{dFixo}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><strong style={{ color: "#0B1929" }}>M</strong>&nbsp;&nbsp;{dCel}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><strong style={{ color: "#0B1929" }}>E</strong>&nbsp;&nbsp;<a href={`mailto:${dEmail}`} style={{ color: "#E67E22", textDecoration: "none" }}>{dEmail}</a></td></tr>
                             </tbody>
                           </table>
                         </td>
                       </tr>
-                      {/* Wordmark */}
-                      <tr><td colSpan={3} style={{ padding: "8px 0 0 0", fontSize: 1, lineHeight: "1px" }}>&nbsp;</td></tr>
-                      <tr><td colSpan={3} style={{ padding: 0 }}><a href="https://www.assistants.com.br" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}><img src={SIG_WORDMARK_URL} alt="Assistants Consulting" width={90} style={{ display: "block", border: 0, width: 90, height: "auto" }} /></a></td></tr>
-                      {/* Bottom separator */}
-                      <tr><td colSpan={3} style={{ padding: "6px 0 0 0", borderBottom: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px" }}>&nbsp;</td></tr>
-                      {/* Addresses */}
-                      <tr><td colSpan={3} style={{ padding: "6px 0 0 0" }}>
-                        <p style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 7.5, color: "#6B7B8D", margin: 0, lineHeight: "11px" }}><span style={{ fontWeight: 600 }}>São Paulo</span>&nbsp;&nbsp;{ENDERECO_SP}</p>
-                        <p style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 7.5, color: "#6B7B8D", margin: "1px 0 0 0", lineHeight: "11px" }}><span style={{ fontWeight: 600 }}>Brasília</span>&nbsp;&nbsp;{ENDERECO_BSB}</p>
+                      <tr><td colSpan={3} style={{ padding: "10px 0 0 0", fontSize: 1, lineHeight: "1px", border: "none" }}>&nbsp;</td></tr>
+                      <tr><td colSpan={3} style={{ padding: 0, border: "none" }}><a href="https://www.assistants.com.br" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}><img src={wordmarkB64 || SIG_WORDMARK_URL} alt="Assistants Consulting" width={100} style={{ display: "block", border: 0, width: 100, height: "auto" }} /></a></td></tr>
+                      <tr><td colSpan={3} style={{ padding: "8px 0 0 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px", borderLeft: "none", borderRight: "none", borderBottom: "none" }}>&nbsp;</td></tr>
+                      <tr><td colSpan={3} style={{ padding: "4px 0 0 0", border: "none" }}>
+                        <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 8, color: "#6B7B8D", margin: 0, lineHeight: "12px" }}><strong>São Paulo</strong>&nbsp;&nbsp;{ENDERECO_SP}</p>
+                        <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 8, color: "#6B7B8D", margin: "2px 0 0 0", lineHeight: "12px" }}><strong>Brasília</strong>&nbsp;&nbsp;{ENDERECO_BSB}</p>
                       </td></tr>
-                      {/* Disclaimer */}
-                      <tr><td colSpan={3} style={{ padding: "8px 0 0 0" }}><p style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 7, color: "#C8CDD3", margin: 0, lineHeight: "9.5px", maxWidth: 520 }}>{AVISO_PT}</p></td></tr>
-                      <tr><td colSpan={3} style={{ padding: "4px 0 0 0" }}><p style={{ fontFamily: "Calibri, Arial, sans-serif", fontSize: 7, color: "#C8CDD3", margin: 0, lineHeight: "9.5px", maxWidth: 520, fontStyle: "italic" }}>{AVISO_EN}</p></td></tr>
+                      <tr><td colSpan={3} style={{ padding: "10px 0 0 0", border: "none" }}><p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 7, color: "#B0B8C1", margin: 0, lineHeight: "10px", maxWidth: 520 }}>{AVISO_PT}</p></td></tr>
+                      <tr><td colSpan={3} style={{ padding: "4px 0 0 0", border: "none" }}><p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 7, color: "#B0B8C1", margin: 0, lineHeight: "10px", maxWidth: 520, fontStyle: "italic" }}>{AVISO_EN}</p></td></tr>
                     </tbody>
                   </table>
                 </div>

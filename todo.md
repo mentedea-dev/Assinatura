@@ -22,3 +22,4 @@
 - [x] BUG: Assinatura - disclaimer muito grande/visível demais — cor #C8CDD3, 7px
 - [x] BUG: Assinatura - falta barra vertical laranja entre foto e dados — 2px #E67E22
 - [x] MELHORIA: Assinatura - tornar mais compacta e proporcional (referência McKinsey/Bain)
+- [x] BUG CRÍTICO: Assinatura colada no Outlook exibe bordas de tabela visíveis e espaçamento irregular — corrigido com border=0 + imagens Base64 inline + Clipboard API
