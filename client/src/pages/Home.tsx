@@ -2,6 +2,13 @@
  * Assistants Consulting — Gerador de Assinatura de E-mail
  * Design: Swiss "Instrument Panel" — split-screen, form left, preview right
  * Brand: Abyssal Navy #0B1929, Inflection Orange #E67E22, Steel Grey #3D4F5F
+ *
+ * Requisitos:
+ * - Dois telefones: fixo e celular
+ * - Cargo bilíngue: português e inglês
+ * - Endereços SP e Brasília fixos
+ * - Aviso legal completo no rodapé
+ * - Opção de incluir foto (sócios/diretores)
  */
 
 import { useState, useRef, useCallback } from "react";
@@ -11,18 +18,26 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Copy, Check, Upload, User, Mail, Phone, Briefcase, Download, Image } from "lucide-react";
+import { Copy, Check, Upload, User, Mail, Phone, Briefcase, Download, Image, Smartphone, Globe } from "lucide-react";
 
 // Asset URLs
 const WORDMARK_URL = "/manus-storage/Assistants_FINAL_Wordmark_d3b4a1a8.png";
-const WORDMARK_INV_URL = "/manus-storage/Assistants_FINAL_Wordmark_Inverted_d4dcd039.png";
 const SYMBOL_URL = "/manus-storage/sig_symbol_478d8f65.png";
 const SIG_WORDMARK_URL = "/manus-storage/sig_wordmark_daf02010.png";
 
+// Company addresses (fixed)
+const ENDERECO_SP = "Rua Cláudio Soares, 72 - 8º andar - Pinheiros - São Paulo/SP - CEP: 05422-030";
+const ENDERECO_BSB = "SCS Quadra 9, Ed. Parque Cidade Corporate - Torre C - Bloco C - 10º andar - Brasília/DF - CEP: 70308-200";
+
+// Legal disclaimer
+const AVISO_LEGAL = "Esta mensagem, incluindo seus anexos, é confidencial e destinada exclusivamente ao(s) destinatário(s) indicado(s). Se você não é o destinatário pretendido, fica notificado de que qualquer uso, disseminação, distribuição ou cópia desta mensagem é estritamente proibido. Caso tenha recebido esta mensagem por engano, por favor notifique imediatamente o remetente por e-mail e apague esta mensagem e todos os seus anexos de seu sistema. A Assistants Consulting não se responsabiliza por opiniões pessoais do remetente que não estejam relacionadas aos negócios da empresa, nem por alterações realizadas após o envio desta mensagem.";
+
 export default function Home() {
   const [nome, setNome] = useState("");
-  const [cargo, setCargo] = useState("");
-  const [telefone, setTelefone] = useState("");
+  const [cargoPT, setCargoPT] = useState("");
+  const [cargoEN, setCargoEN] = useState("");
+  const [telefoneFixo, setTelefoneFixo] = useState("");
+  const [celular, setCelular] = useState("");
   const [email, setEmail] = useState("");
   const [incluirFoto, setIncluirFoto] = useState(false);
   const [fotoUrl, setFotoUrl] = useState<string | null>(null);
@@ -49,7 +64,6 @@ export default function Home() {
     if (!previewRef.current) return;
 
     try {
-      // Select the preview content and copy
       const range = document.createRange();
       range.selectNodeContents(previewRef.current);
       const selection = window.getSelection();
@@ -66,6 +80,48 @@ export default function Home() {
     }
   }, []);
 
+  const generateHTML = useCallback(() => {
+    const imgSize = incluirFoto ? 70 : 50;
+    const borderRadius = incluirFoto ? "border-radius:50%;object-fit:cover;" : "";
+    const imgAlt = incluirFoto ? "Foto" : "A";
+    const actualImgSrc = incluirFoto && fotoUrl ? fotoUrl : SYMBOL_URL;
+
+    const displayNome = nome || "[Nome Completo]";
+    const displayCargoPT = cargoPT || "[Cargo em Português]";
+    const displayCargoEN = cargoEN || "[Position in English]";
+    const displayFixo = telefoneFixo || "+55 (XX) XXXX-XXXX";
+    const displayCelular = celular || "+55 (XX) XXXXX-XXXX";
+    const displayEmail = email || "nome@assistants.com.br";
+
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="color-scheme" content="light"></head>
+<body style="margin:0;padding:0;background:#fff;">
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,sans-serif;max-width:600px;">
+<tr><td colspan="3" style="padding:0 0 14px 0;"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td style="border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td></tr>
+<tr>
+<td style="vertical-align:top;padding:0;width:${imgSize + 6}px;"><img src="${actualImgSrc}" alt="${imgAlt}" width="${imgSize}" height="${imgSize}" style="display:block;border:0;width:${imgSize}px;height:${imgSize}px;${borderRadius}" /></td>
+<td style="vertical-align:top;padding:0 14px;width:3px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background-color:#E67E22;width:2px;height:${imgSize}px;font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td>
+<td style="vertical-align:top;padding:0;">
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:14px;font-weight:700;color:#0B1929;line-height:18px;padding:0 0 1px 0;">${displayNome}</td></tr>
+<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:10px;font-weight:600;color:#E67E22;line-height:13px;padding:0;text-transform:uppercase;letter-spacing:0.6px;">${displayCargoPT}</td></tr>
+<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:9px;font-weight:400;color:#3D4F5F;line-height:13px;padding:0 0 6px 0;font-style:italic;">${displayCargoEN}</td></tr>
+<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:10px;color:#3D4F5F;line-height:16px;padding:0;"><span style="color:#0B1929;font-weight:600;">T</span>&nbsp;&nbsp;${displayFixo}</td></tr>
+<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:10px;color:#3D4F5F;line-height:16px;padding:0;"><span style="color:#0B1929;font-weight:600;">M</span>&nbsp;&nbsp;${displayCelular}</td></tr>
+<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:10px;color:#3D4F5F;line-height:16px;padding:0;"><span style="color:#0B1929;font-weight:600;">E</span>&nbsp;&nbsp;<a href="mailto:${displayEmail}" style="color:#E67E22;text-decoration:none;">${displayEmail}</a></td></tr>
+</table></td></tr>
+<tr><td colspan="3" style="padding:12px 0 0 0;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+<tr><td colspan="3" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${SIG_WORDMARK_URL}" alt="Assistants Consulting" width="140" style="display:block;border:0;width:140px;height:auto;" /></a></td></tr>
+<tr><td colspan="3" style="padding:10px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td style="border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td></tr>
+<tr><td colspan="3" style="padding:8px 0 0 0;">
+<p style="font-family:Calibri,Arial,sans-serif;font-size:8px;color:#3D4F5F;margin:0;line-height:12px;"><span style="font-weight:600;">São Paulo</span>&nbsp;&nbsp;${ENDERECO_SP}</p>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:8px;color:#3D4F5F;margin:2px 0 0 0;line-height:12px;"><span style="font-weight:600;">Brasília</span>&nbsp;&nbsp;${ENDERECO_BSB}</p>
+</td></tr>
+<tr><td colspan="3" style="padding:10px 0 0 0;"><p style="font-family:Calibri,Arial,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:580px;">${AVISO_LEGAL}</p></td></tr>
+</table></body></html>`;
+  }, [nome, cargoPT, cargoEN, telefoneFixo, celular, email, fotoUrl, incluirFoto]);
+
   const handleDownloadHTML = useCallback(() => {
     const html = generateHTML();
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
@@ -76,42 +132,14 @@ export default function Home() {
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Arquivo HTML baixado com sucesso.");
-  }, [nome, cargo, telefone, email, fotoUrl, incluirFoto]);
+  }, [generateHTML, nome]);
 
-  const generateHTML = () => {
-    const imgSrc = incluirFoto && fotoUrl ? fotoUrl : "";
-    const symbolSrc = SYMBOL_URL;
-    const wmSrc = SIG_WORDMARK_URL;
-    const imgSize = incluirFoto ? 70 : 50;
-    const borderRadius = incluirFoto ? "border-radius:50%;object-fit:cover;" : "";
-    const imgAlt = incluirFoto ? "Foto" : "A";
-    const actualImgSrc = incluirFoto && fotoUrl ? fotoUrl : symbolSrc;
-
-    return `<!DOCTYPE html>
-<html lang="pt-BR">
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#fff;">
-<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,sans-serif;max-width:540px;">
-<tr><td colspan="3" style="padding:0 0 16px 0;"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td style="border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td></tr>
-<tr>
-<td style="vertical-align:top;padding:0;width:${imgSize + 6}px;"><img src="${actualImgSrc}" alt="${imgAlt}" width="${imgSize}" height="${imgSize}" style="display:block;border:0;width:${imgSize}px;height:${imgSize}px;${borderRadius}" /></td>
-<td style="vertical-align:top;padding:0 14px;width:3px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background-color:#E67E22;width:2px;height:${imgSize}px;font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td>
-<td style="vertical-align:top;padding:0;">
-<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:14px;font-weight:700;color:#0B1929;line-height:18px;padding:0 0 1px 0;">${nome || "[Nome Completo]"}</td></tr>
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:10px;font-weight:600;color:#E67E22;line-height:14px;padding:0 0 6px 0;text-transform:uppercase;letter-spacing:0.8px;">${cargo || "[Cargo / Função]"}</td></tr>
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:10px;color:#3D4F5F;line-height:16px;padding:0;"><span style="color:#0B1929;font-weight:600;">T</span>&nbsp;&nbsp;${telefone || "+55 (XX) XXXXX-XXXX"}</td></tr>
-<tr><td style="font-family:Calibri,Arial,sans-serif;font-size:10px;color:#3D4F5F;line-height:16px;padding:0;"><span style="color:#0B1929;font-weight:600;">E</span>&nbsp;&nbsp;<a href="mailto:${email || "nome@assistants.com.br"}" style="color:#E67E22;text-decoration:none;">${email || "nome@assistants.com.br"}</a></td></tr>
-</table></td></tr>
-<tr><td colspan="3" style="padding:10px 0 0 0;font-size:1px;line-height:1px;">&nbsp;</td></tr>
-<tr><td colspan="3" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="140" style="display:block;border:0;width:140px;height:auto;" /></a></td></tr>
-<tr><td colspan="3" style="padding:10px 0 0 0;"><p style="font-family:Calibri,Arial,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:500px;">Esta mensagem e seus anexos são confidenciais e destinados exclusivamente ao destinatário indicado. Se você recebeu esta mensagem por engano, notifique o remetente e apague-a de seu sistema.</p></td></tr>
-</table></body></html>`;
-  };
-
+  // Display values for preview
   const displayNome = nome || "Nome Completo";
-  const displayCargo = cargo || "Cargo / Função";
-  const displayTelefone = telefone || "+55 (XX) XXXXX-XXXX";
+  const displayCargoPT = cargoPT || "Cargo em Português";
+  const displayCargoEN = cargoEN || "Position in English";
+  const displayFixo = telefoneFixo || "+55 (XX) XXXX-XXXX";
+  const displayCelular = celular || "+55 (XX) XXXXX-XXXX";
   const displayEmail = email || "nome@assistants.com.br";
 
   return (
@@ -164,32 +192,62 @@ export default function Home() {
                 />
               </div>
 
-              {/* Cargo */}
+              {/* Cargo PT */}
               <div className="space-y-2">
-                <Label htmlFor="cargo" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
+                <Label htmlFor="cargoPT" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
                   <Briefcase className="w-3.5 h-3.5" />
-                  Cargo / Função
+                  Cargo (Português)
                 </Label>
                 <Input
-                  id="cargo"
+                  id="cargoPT"
                   placeholder="Atuária Sênior"
-                  value={cargo}
-                  onChange={(e) => setCargo(e.target.value)}
+                  value={cargoPT}
+                  onChange={(e) => setCargoPT(e.target.value)}
                   className="h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1]"
                 />
               </div>
 
-              {/* Telefone */}
+              {/* Cargo EN */}
               <div className="space-y-2">
-                <Label htmlFor="telefone" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5" />
-                  Telefone
+                <Label htmlFor="cargoEN" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
+                  <Globe className="w-3.5 h-3.5" />
+                  Cargo (English)
                 </Label>
                 <Input
-                  id="telefone"
-                  placeholder="+55 (21) 3500-0000"
-                  value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
+                  id="cargoEN"
+                  placeholder="Senior Actuary"
+                  value={cargoEN}
+                  onChange={(e) => setCargoEN(e.target.value)}
+                  className="h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1]"
+                />
+              </div>
+
+              {/* Telefone Fixo */}
+              <div className="space-y-2">
+                <Label htmlFor="fixo" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5" />
+                  Telefone fixo
+                </Label>
+                <Input
+                  id="fixo"
+                  placeholder="+55 (11) 3500-0000"
+                  value={telefoneFixo}
+                  onChange={(e) => setTelefoneFixo(e.target.value)}
+                  className="h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1]"
+                />
+              </div>
+
+              {/* Celular */}
+              <div className="space-y-2">
+                <Label htmlFor="celular" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
+                  <Smartphone className="w-3.5 h-3.5" />
+                  Celular
+                </Label>
+                <Input
+                  id="celular"
+                  placeholder="+55 (11) 99999-0000"
+                  value={celular}
+                  onChange={(e) => setCelular(e.target.value)}
                   className="h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1]"
                 />
               </div>
@@ -217,7 +275,7 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <Image className="w-3.5 h-3.5 text-[#3D4F5F]" />
                   <Label htmlFor="foto-toggle" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider">
-                    Incluir foto
+                    Incluir foto (sócios e diretores)
                   </Label>
                 </div>
                 <Switch
@@ -353,13 +411,13 @@ export default function Home() {
                     style={{
                       borderCollapse: "collapse",
                       fontFamily: "Calibri, Arial, Helvetica, sans-serif",
-                      maxWidth: 540,
+                      maxWidth: 600,
                     }}
                   >
-                    {/* Separator */}
                     <tbody>
+                      {/* Separator */}
                       <tr>
-                        <td colSpan={3} style={{ padding: "0 0 16px 0" }}>
+                        <td colSpan={3} style={{ padding: "0 0 14px 0" }}>
                           <table cellPadding={0} cellSpacing={0} style={{ width: "100%" }}>
                             <tbody>
                               <tr>
@@ -432,6 +490,7 @@ export default function Home() {
                         <td style={{ verticalAlign: "top", padding: 0 }}>
                           <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse" }}>
                             <tbody>
+                              {/* Name */}
                               <tr>
                                 <td
                                   style={{
@@ -446,6 +505,7 @@ export default function Home() {
                                   {displayNome}
                                 </td>
                               </tr>
+                              {/* Cargo PT */}
                               <tr>
                                 <td
                                   style={{
@@ -453,15 +513,32 @@ export default function Home() {
                                     fontSize: 10,
                                     fontWeight: 600,
                                     color: "#E67E22",
-                                    lineHeight: "14px",
-                                    padding: "0 0 6px 0",
+                                    lineHeight: "13px",
+                                    padding: 0,
                                     textTransform: "uppercase",
-                                    letterSpacing: "0.8px",
+                                    letterSpacing: "0.6px",
                                   }}
                                 >
-                                  {displayCargo}
+                                  {displayCargoPT}
                                 </td>
                               </tr>
+                              {/* Cargo EN */}
+                              <tr>
+                                <td
+                                  style={{
+                                    fontFamily: "Calibri, Arial, sans-serif",
+                                    fontSize: 9,
+                                    fontWeight: 400,
+                                    color: "#3D4F5F",
+                                    lineHeight: "13px",
+                                    padding: "0 0 6px 0",
+                                    fontStyle: "italic",
+                                  }}
+                                >
+                                  {displayCargoEN}
+                                </td>
+                              </tr>
+                              {/* Telefone fixo */}
                               <tr>
                                 <td
                                   style={{
@@ -473,9 +550,25 @@ export default function Home() {
                                   }}
                                 >
                                   <span style={{ color: "#0B1929", fontWeight: 600 }}>T</span>
-                                  &nbsp;&nbsp;{displayTelefone}
+                                  &nbsp;&nbsp;{displayFixo}
                                 </td>
                               </tr>
+                              {/* Celular */}
+                              <tr>
+                                <td
+                                  style={{
+                                    fontFamily: "Calibri, Arial, sans-serif",
+                                    fontSize: 10,
+                                    color: "#3D4F5F",
+                                    lineHeight: "16px",
+                                    padding: 0,
+                                  }}
+                                >
+                                  <span style={{ color: "#0B1929", fontWeight: 600 }}>M</span>
+                                  &nbsp;&nbsp;{displayCelular}
+                                </td>
+                              </tr>
+                              {/* Email */}
                               <tr>
                                 <td
                                   style={{
@@ -503,7 +596,7 @@ export default function Home() {
 
                       {/* Spacing */}
                       <tr>
-                        <td colSpan={3} style={{ padding: "10px 0 0 0", fontSize: 1, lineHeight: "1px" }}>
+                        <td colSpan={3} style={{ padding: "12px 0 0 0", fontSize: 1, lineHeight: "1px" }}>
                           &nbsp;
                         </td>
                       </tr>
@@ -527,7 +620,52 @@ export default function Home() {
                         </td>
                       </tr>
 
-                      {/* Disclaimer */}
+                      {/* Separator before addresses */}
+                      <tr>
+                        <td colSpan={3} style={{ padding: "10px 0 0 0" }}>
+                          <table cellPadding={0} cellSpacing={0} style={{ width: "100%" }}>
+                            <tbody>
+                              <tr>
+                                <td style={{ borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px" }}>
+                                  &nbsp;
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      {/* Addresses */}
+                      <tr>
+                        <td colSpan={3} style={{ padding: "8px 0 0 0" }}>
+                          <p
+                            style={{
+                              fontFamily: "Calibri, Arial, sans-serif",
+                              fontSize: 8,
+                              color: "#3D4F5F",
+                              margin: 0,
+                              lineHeight: "12px",
+                            }}
+                          >
+                            <span style={{ fontWeight: 600 }}>São Paulo</span>
+                            &nbsp;&nbsp;{ENDERECO_SP}
+                          </p>
+                          <p
+                            style={{
+                              fontFamily: "Calibri, Arial, sans-serif",
+                              fontSize: 8,
+                              color: "#3D4F5F",
+                              margin: "2px 0 0 0",
+                              lineHeight: "12px",
+                            }}
+                          >
+                            <span style={{ fontWeight: 600 }}>Brasília</span>
+                            &nbsp;&nbsp;{ENDERECO_BSB}
+                          </p>
+                        </td>
+                      </tr>
+
+                      {/* Legal disclaimer */}
                       <tr>
                         <td colSpan={3} style={{ padding: "10px 0 0 0" }}>
                           <p
@@ -537,12 +675,10 @@ export default function Home() {
                               color: "#B0B8C1",
                               margin: 0,
                               lineHeight: "10px",
-                              maxWidth: 500,
+                              maxWidth: 580,
                             }}
                           >
-                            Esta mensagem e seus anexos são confidenciais e destinados exclusivamente
-                            ao destinatário indicado. Se você recebeu esta mensagem por engano,
-                            notifique o remetente e apague-a de seu sistema.
+                            {AVISO_LEGAL}
                           </p>
                         </td>
                       </tr>
