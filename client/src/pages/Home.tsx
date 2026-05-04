@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { SIG_SYMBOL_B64, SIG_WORDMARK_B64 } from "@shared/signatureAssets";
 import {
   Copy, Check, Upload, User, Mail, Phone, Briefcase,
   Download, Image, Smartphone, Loader2,
@@ -81,10 +82,9 @@ export default function Home() {
   const prevRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Fetch base64 images from server for embedding in HTML
-  const { data: imgData } = trpc.assets.signatureImages.useQuery();
-  const symbolB64 = imgData?.symbolB64 || "";
-  const wordmarkB64 = imgData?.wordmarkB64 || "";
+  // Base64 images imported directly as constants (no server dependency)
+  const symbolB64 = SIG_SYMBOL_B64;
+  const wordmarkB64 = SIG_WORDMARK_B64;
 
   const fixo = fmtPhone(fixoRaw, false);
   const cel = fmtPhone(celRaw, true);
@@ -188,10 +188,6 @@ export default function Home() {
 
   /** Copy: write the generated HTML to clipboard so Outlook receives clean HTML with base64 images */
   const handleCopy = useCallback(async () => {
-    if (!symbolB64 || !wordmarkB64) {
-      toast.error("Aguarde o carregamento das imagens...");
-      return;
-    }
     try {
       const html = genHTML();
       const blob = new Blob([html], { type: "text/html" });
@@ -226,7 +222,7 @@ export default function Home() {
         toast.error("Erro ao copiar. Tente 'Baixar HTML' e cole manualmente.");
       }
     }
-  }, [genHTML, symbolB64, wordmarkB64]);
+  }, [genHTML]);
 
   const handleDL = useCallback(() => {
     const html = genHTML();
@@ -393,10 +389,10 @@ export default function Home() {
 
             {/* Buttons */}
             <div className="flex gap-3">
-              <Button onClick={handleCopy} disabled={!phonesOk || !symbolB64} className="flex-1 h-12 bg-[#0B1929] hover:bg-[#162a40] text-white font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button onClick={handleCopy} disabled={!phonesOk} className="flex-1 h-12 bg-[#0B1929] hover:bg-[#162a40] text-white font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                 {copied ? (<><Check className="w-4 h-4 mr-2" /> Copiado!</>) : (<><Copy className="w-4 h-4 mr-2" /> Copiar assinatura</>)}
               </Button>
-              <Button variant="outline" onClick={handleDL} disabled={!phonesOk || !symbolB64} className="h-12 px-5 border-[#E7E9EB] text-[#3D4F5F] hover:border-[#0B1929] hover:text-[#0B1929] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button variant="outline" onClick={handleDL} disabled={!phonesOk} className="h-12 px-5 border-[#E7E9EB] text-[#3D4F5F] hover:border-[#0B1929] hover:text-[#0B1929] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 <Download className="w-4 h-4 mr-2" /> Baixar HTML
               </Button>
             </div>
