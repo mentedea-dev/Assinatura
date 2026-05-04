@@ -15,3 +15,10 @@
 - [x] BUG: Tradução automática do cargo não está funcionando (corrigido - funciona com debounce 800ms)
 - [x] BUG: Máscara de telefone não formata automaticamente os números digitados (corrigido - input aceita dígitos puros, resultado formatado abaixo)
 - [x] Email: domínio @assistants.com.br fixo, colaborador digita apenas o username
+- [x] BUG: Assinatura - foto deve ser circular (não quadrada) — VML para Outlook + CSS border-radius
+- [x] BUG: Assinatura - wordmark ASSISTANTS muito grande, reduzir — de 140px para 90px
+- [x] BUG: Assinatura - linha laranja desproporcional — removida linha horizontal, mantida barra vertical
+- [x] BUG: Assinatura - espaçamento irregular entre elementos — gaps reduzidos para 8px
+- [x] BUG: Assinatura - disclaimer muito grande/visível demais — cor #C8CDD3, 7px
+- [x] BUG: Assinatura - falta barra vertical laranja entre foto e dados — 2px #E67E22
+- [x] MELHORIA: Assinatura - tornar mais compacta e proporcional (referência McKinsey/Bain)
