@@ -27,3 +27,4 @@
 - [x] BUG: Botões desabilitados na versão publicada — corrigido: imagens Base64 importadas diretamente de @shared/signatureAssets (sem dependência do servidor/tRPC)
 - [x] BUG: Toast de confirmação não aparece ao copiar — corrigido: removida dependência de next-themes no Sonner, posição alterada para top-center
 - [x] BUG CRÍTICO: Assinatura copiada está desconfigurada e cheia de espaços — corrigido: HTML gerado agora em linha única sem whitespace entre tags (parts.join(''))
+- [x] Remover botão "Copiar assinatura" e código associado (handleCopy, estado copied, toast)

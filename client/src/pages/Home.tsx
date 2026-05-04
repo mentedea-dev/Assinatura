@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { SIG_SYMBOL_B64, SIG_WORDMARK_B64 } from "@shared/signatureAssets";
 import {
-  Copy, Check, Upload, User, Mail, Phone, Briefcase,
+  Upload, User, Mail, Phone, Briefcase,
   Download, Image, Smartphone, Loader2,
 } from "lucide-react";
 
@@ -76,7 +76,7 @@ export default function Home() {
   const [emailUser, setEmailUser] = useState("");
   const [foto, setFoto] = useState(false);
   const [fotoUrl, setFotoUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+
   const [translating, setTranslating] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const prevRef = useRef<HTMLDivElement>(null);
@@ -187,43 +187,6 @@ export default function Home() {
     return parts.join('');
   }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto, symbolB64, wordmarkB64]);
 
-  /** Copy: write the generated HTML to clipboard so Outlook receives clean HTML with base64 images */
-  const handleCopy = useCallback(async () => {
-    try {
-      const html = genHTML();
-      const blob = new Blob([html], { type: "text/html" });
-      const plainBlob = new Blob([html], { type: "text/plain" });
-      await navigator.clipboard.write([
-        new ClipboardItem({ "text/html": blob, "text/plain": plainBlob }),
-      ]);
-      setCopied(true);
-      toast.success("Assinatura copiada! Cole no Outlook com Ctrl+V.");
-      setTimeout(() => setCopied(false), 3000);
-    } catch {
-      // Fallback: create a hidden div with the HTML and use execCommand
-      try {
-        const html = genHTML();
-        const tmp = document.createElement("div");
-        tmp.innerHTML = html;
-        tmp.style.position = "fixed";
-        tmp.style.left = "-9999px";
-        document.body.appendChild(tmp);
-        const range = document.createRange();
-        range.selectNodeContents(tmp);
-        const sel = window.getSelection();
-        sel?.removeAllRanges();
-        sel?.addRange(range);
-        document.execCommand("copy");
-        sel?.removeAllRanges();
-        document.body.removeChild(tmp);
-        setCopied(true);
-        toast.success("Assinatura copiada! Cole no Outlook com Ctrl+V.");
-        setTimeout(() => setCopied(false), 3000);
-      } catch {
-        toast.error("Erro ao copiar. Tente 'Baixar HTML' e cole manualmente.");
-      }
-    }
-  }, [genHTML]);
 
   const handleDL = useCallback(() => {
     const html = genHTML();
@@ -388,12 +351,9 @@ export default function Home() {
               )}
             </div>
 
-            {/* Buttons */}
+            {/* Button */}
             <div className="flex gap-3">
-              <Button onClick={handleCopy} disabled={!phonesOk} className="flex-1 h-12 bg-[#0B1929] hover:bg-[#162a40] text-white font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                {copied ? (<><Check className="w-4 h-4 mr-2" /> Copiado!</>) : (<><Copy className="w-4 h-4 mr-2" /> Copiar assinatura</>)}
-              </Button>
-              <Button variant="outline" onClick={handleDL} disabled={!phonesOk} className="h-12 px-5 border-[#E7E9EB] text-[#3D4F5F] hover:border-[#0B1929] hover:text-[#0B1929] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button onClick={handleDL} disabled={!phonesOk} className="flex-1 h-12 bg-[#0B1929] hover:bg-[#162a40] text-white font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                 <Download className="w-4 h-4 mr-2" /> Baixar HTML
               </Button>
             </div>
@@ -409,8 +369,9 @@ export default function Home() {
               <h3 className="text-xs font-semibold text-[#0B1929] uppercase tracking-wider mb-2">Como usar</h3>
               <ol className="text-xs text-[#3D4F5F] space-y-1.5 list-decimal list-inside leading-relaxed">
                 <li>Preencha todos os campos ao lado</li>
-                <li>Clique em <strong>"Copiar assinatura"</strong></li>
+                <li>Clique em <strong>"Baixar HTML"</strong></li>
                 <li>No Outlook, vá em <strong>Configurações &gt; Email &gt; Assinaturas</strong></li>
+                <li>Abra o arquivo <strong>.htm</strong> baixado, selecione tudo (<strong>Ctrl+A</strong>) e copie (<strong>Ctrl+C</strong>)</li>
                 <li>Cole com <strong>Ctrl+V</strong> na caixa de assinatura</li>
                 <li>Salve e pronto!</li>
               </ol>
