@@ -486,14 +486,23 @@ export default function Home() {
 
             {/* Instructions */}
             <div className="bg-[#FDF6EE] border border-[#F5DFC3] rounded-lg p-4">
-              <h3 className="text-xs font-semibold text-[#0B1929] uppercase tracking-wider mb-2">Como usar</h3>
-              <ol className="text-xs text-[#3D4F5F] space-y-1.5 list-decimal list-inside leading-relaxed">
-                <li>Preencha todos os campos ao lado</li>
-                <li>Clique em <strong>"Baixar pacote de assinatura"</strong></li>
-                <li>Extraia o arquivo <strong>.zip</strong> baixado</li>
-                <li>Copie o arquivo <strong>.htm</strong> e a pasta <strong>_files</strong> para <strong>%AppData%\Microsoft\Signatures\</strong></li>
-                <li>No Outlook, vá em <strong>Configurações &gt; Email &gt; Assinaturas</strong> e selecione a assinatura</li>
-                <li>Salve e pronto!</li>
+              <h3 className="text-sm font-semibold text-[#0B1929] mb-3">Outlook clássico para Windows</h3>
+              <ol className="text-xs text-[#3D4F5F] space-y-2 list-decimal list-inside leading-relaxed">
+                <li>Feche o Outlook.</li>
+                <li>Pressione <strong>Win + R</strong>.</li>
+                <li>Cole este caminho e pressione Enter:
+                  <div className="bg-[#F3F4F6] border border-[#E5E7EB] rounded-md px-3 py-2 mt-1.5 mb-1 font-mono text-[11px] text-[#1F2937] select-all">%APPDATA%\Microsoft\Signatures</div>
+                </li>
+                <li>Extraia o <strong>.zip</strong> baixado e copie o arquivo <code className="bg-[#E5E7EB] px-1.5 py-0.5 rounded text-[11px] font-mono">.HTM</code> e a pasta <code className="bg-[#E5E7EB] px-1.5 py-0.5 rounded text-[11px] font-mono">_files</code> para essa pasta.</li>
+                <li>O resultado deve ficar assim:
+                  <div className="bg-[#F3F4F6] border border-[#E5E7EB] rounded-md px-3 py-2 mt-1.5 mb-1 font-mono text-[11px] text-[#1F2937] leading-relaxed">Assinatura_SeuNome.htm<br/>Assinatura_SeuNome_files\</div>
+                </li>
+                <li>Abra o Outlook.</li>
+                <li>Vá em:
+                  <div className="bg-[#F3F4F6] border border-[#E5E7EB] rounded-md px-3 py-2 mt-1.5 mb-1 font-mono text-[11px] text-[#1F2937]">Arquivo &gt; Opções &gt; Email &gt; Assinaturas</div>
+                </li>
+                <li>A assinatura deve aparecer na lista com o nome do arquivo.</li>
+                <li>Selecione-a como padrão para <strong>Novas mensagens</strong> e/ou <strong>Respostas/encaminhamentos</strong>.</li>
               </ol>
             </div>
           </div>

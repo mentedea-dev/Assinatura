@@ -29,3 +29,4 @@
 - [x] BUG CRÍTICO: Assinatura copiada está desconfigurada e cheia de espaços — corrigido: HTML gerado agora em linha única sem whitespace entre tags (parts.join(''))
 - [x] Remover botão "Copiar assinatura" e código associado (handleCopy, estado copied, toast)
 - [x] Gerar pacote ZIP com arquivo .htm + pasta _files contendo imagens (formato Outlook para assinaturas)
+- [x] Atualizar guia "Como usar" com instruções detalhadas do Outlook clássico para Windows (Win+R, %APPDATA%\Microsoft\Signatures, copiar .htm e _files, Arquivo > Opções > Email > Assinaturas, selecionar como padrão)
