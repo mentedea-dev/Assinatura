@@ -12,3 +12,6 @@
 - [x] Phone mask with auto-formatting (+55 (XX) XXXX-XXXX / XXXXX-XXXX)
 - [x] DDD validation for Brazilian phone numbers
 - [x] Bilingual legal disclaimer (Portuguese + English) in signature footer
+- [x] BUG: Tradução automática do cargo não está funcionando (corrigido - funciona com debounce 800ms)
+- [x] BUG: Máscara de telefone não formata automaticamente os números digitados (corrigido - input aceita dígitos puros, resultado formatado abaixo)
+- [x] Email: domínio @assistants.com.br fixo, colaborador digita apenas o username

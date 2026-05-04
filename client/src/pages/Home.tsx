@@ -1,6 +1,6 @@
-/*
+/**
  * Assistants Consulting — Gerador de Assinatura de E-mail
- * Features: Auto-translate, phone masks, bilingual disclaimer
+ * Features: Auto-translate, phone masks, bilingual disclaimer, fixed email domain
  */
 
 import { useState, useRef, useCallback, useEffect } from "react";
@@ -38,13 +38,20 @@ const VALID_DDDS = new Set([
   "91","92","93","94","95","96","97","98","99",
 ]);
 
-function digitsOnly(v: string) { return v.replace(/\D/g, ""); }
+const EMAIL_DOMAIN = "@assistants.com.br";
 
+/** Extract only digits from any string */
+function digitsOnly(v: string): string {
+  return v.replace(/\D/g, "");
+}
+
+/** Format raw digits into phone display. Raw should be ONLY digits (no +55 prefix stored). */
 function fmtPhone(raw: string, mobile: boolean): string {
-  const d = digitsOnly(raw).slice(0, mobile ? 11 : 10);
+  const d = raw.slice(0, mobile ? 11 : 10);
   if (!d) return "";
   if (d.length <= 2) return `+55 (${d}`;
-  const ddd = d.slice(0, 2), rest = d.slice(2);
+  const ddd = d.slice(0, 2);
+  const rest = d.slice(2);
   if (mobile) {
     if (rest.length <= 5) return `+55 (${ddd}) ${rest}`;
     return `+55 (${ddd}) ${rest.slice(0, 5)}-${rest.slice(5)}`;
@@ -53,22 +60,23 @@ function fmtPhone(raw: string, mobile: boolean): string {
   return `+55 (${ddd}) ${rest.slice(0, 4)}-${rest.slice(4)}`;
 }
 
-function isDDDOk(raw: string) {
-  const ddd = digitsOnly(raw).slice(0, 2);
+function isDDDOk(raw: string): boolean {
+  const ddd = raw.slice(0, 2);
   return ddd.length < 2 || VALID_DDDS.has(ddd);
 }
 
-function isComplete(raw: string, mobile: boolean) {
-  return digitsOnly(raw).length === (mobile ? 11 : 10);
+function isComplete(raw: string, mobile: boolean): boolean {
+  return raw.length === (mobile ? 11 : 10);
 }
 
 export default function Home() {
+  // State stores RAW DIGITS ONLY for phones (e.g. "1135000000")
   const [nome, setNome] = useState("");
   const [cargoPT, setCargoPT] = useState("");
   const [cargoEN, setCargoEN] = useState("");
   const [fixoRaw, setFixoRaw] = useState("");
   const [celRaw, setCelRaw] = useState("");
-  const [email, setEmail] = useState("");
+  const [emailUser, setEmailUser] = useState(""); // only the part before @
   const [foto, setFoto] = useState(false);
   const [fotoUrl, setFotoUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -77,11 +85,19 @@ export default function Home() {
   const prevRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Formatted display values
   const fixo = fmtPhone(fixoRaw, false);
   const cel = fmtPhone(celRaw, true);
+  const fullEmail = emailUser ? `${emailUser}${EMAIL_DOMAIN}` : "";
+
+  // For the input fields, we show raw digits only (no formatting in the input itself)
+  // The formatted version is shown below the field as helper text
+
+  // Validation
   const fixoErr = fixoRaw.length >= 2 && !isDDDOk(fixoRaw);
   const celErr = celRaw.length >= 2 && !isDDDOk(celRaw);
 
+  // Translation via LLM
   const tMut = trpc.translate.jobTitle.useMutation({
     onSuccess: (d) => { if (d.translated) setCargoEN(d.translated); setTranslating(false); },
     onError: () => { setTranslating(false); toast.error("Erro ao traduzir o cargo."); },
@@ -96,11 +112,32 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cargoPT]);
 
+  /**
+   * Phone input handler: user types raw digits only (e.g. "1135000000").
+   * The input field shows raw digits; formatted version appears below.
+   */
   const onFixo = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFixoRaw(digitsOnly(e.target.value).slice(0, 10));
+    // Only allow digits in the input
+    let digits = e.target.value.replace(/\D/g, "");
+    // If user pasted with country code prefix "55", strip it
+    if (digits.length > 10 && digits.startsWith("55")) {
+      digits = digits.slice(2);
+    }
+    setFixoRaw(digits.slice(0, 10));
   }, []);
+
   const onCel = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setCelRaw(digitsOnly(e.target.value).slice(0, 11));
+    let digits = e.target.value.replace(/\D/g, "");
+    if (digits.length > 11 && digits.startsWith("55")) {
+      digits = digits.slice(2);
+    }
+    setCelRaw(digits.slice(0, 11));
+  }, []);
+
+  const onEmailUser = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only allow valid email local-part characters, lowercase
+    const val = e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, "");
+    setEmailUser(val);
   }, []);
 
   const onFoto = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,7 +174,7 @@ export default function Home() {
     const den = cargoEN || "[Position]";
     const df = fixo || "+55 (XX) XXXX-XXXX";
     const dc = cel || "+55 (XX) XXXXX-XXXX";
-    const de = email || "nome@assistants.com.br";
+    const de = fullEmail || "nome@assistants.com.br";
 
     return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="color-scheme" content="light"></head><body style="margin:0;padding:0;background:#fff;">
 <table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,sans-serif;max-width:600px;">
@@ -164,7 +201,7 @@ export default function Home() {
 <tr><td colspan="3" style="padding:10px 0 0 0;"><p style="font-family:Calibri,Arial,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:580px;">${AVISO_PT}</p></td></tr>
 <tr><td colspan="3" style="padding:6px 0 0 0;"><p style="font-family:Calibri,Arial,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:580px;font-style:italic;">${AVISO_EN}</p></td></tr>
 </table></body></html>`;
-  }, [nome, cargoPT, cargoEN, fixo, cel, email, fotoUrl, foto]);
+  }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto]);
 
   const handleDL = useCallback(() => {
     const html = genHTML();
@@ -183,12 +220,13 @@ export default function Home() {
   const celValid = celRaw.length === 0 || (isComplete(celRaw, true) && isDDDOk(celRaw));
   const phonesOk = fixoValid && celValid && !fixoErr && !celErr;
 
+  // Display values for preview
   const dNome = nome || "Nome Completo";
   const dPT = cargoPT || "Cargo em Português";
   const dEN = cargoEN || "Position in English";
   const dFixo = fixo || "+55 (XX) XXXX-XXXX";
   const dCel = cel || "+55 (XX) XXXXX-XXXX";
-  const dEmail = email || "nome@assistants.com.br";
+  const dEmail = fullEmail || "nome@assistants.com.br";
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAFBFC]">
@@ -241,17 +279,26 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Fixo */}
+              {/* Telefone Fixo */}
               <div className="space-y-2">
                 <Label htmlFor="fixo" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
                   <Phone className="w-3.5 h-3.5" /> Telefone fixo
                 </Label>
-                <Input id="fixo" placeholder="+55 (11) 3500-0000" value={fixo} onChange={onFixo}
-                  className={`h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1] ${fixoErr ? "border-red-400 focus:border-red-400" : ""}`} />
+                <Input
+                  id="fixo"
+                  placeholder="1135000000"
+                  value={fixoRaw}
+                  onChange={onFixo}
+                  inputMode="numeric"
+                  maxLength={10}
+                  className={`h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1] font-mono ${fixoErr ? "border-red-400 focus:border-red-400" : ""}`}
+                />
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#B0B8C1]">{fixo || "Formato: +55 (XX) XXXX-XXXX"}</span>
+                  <span className="text-[10px] text-[#3D4F5F] font-medium">
+                    {fixoRaw.length > 0 ? `Resultado: ${fixo}` : "Digite DDD + número (ex: 1135000000)"}
+                  </span>
                   {fixoErr && <span className="text-[10px] text-red-500 font-medium">DDD inválido</span>}
-                  {fixoRaw.length >= 2 && !fixoErr && isComplete(fixoRaw, false) && <span className="text-[10px] text-emerald-600 font-medium">Válido</span>}
+                  {fixoRaw.length >= 2 && !fixoErr && isComplete(fixoRaw, false) && <span className="text-[10px] text-emerald-600 font-medium">Válido ✓</span>}
                 </div>
               </div>
 
@@ -260,22 +307,45 @@ export default function Home() {
                 <Label htmlFor="cel" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
                   <Smartphone className="w-3.5 h-3.5" /> Celular
                 </Label>
-                <Input id="cel" placeholder="+55 (11) 99999-0000" value={cel} onChange={onCel}
-                  className={`h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1] ${celErr ? "border-red-400 focus:border-red-400" : ""}`} />
+                <Input
+                  id="cel"
+                  placeholder="11999990000"
+                  value={celRaw}
+                  onChange={onCel}
+                  inputMode="numeric"
+                  maxLength={11}
+                  className={`h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1] font-mono ${celErr ? "border-red-400 focus:border-red-400" : ""}`}
+                />
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#B0B8C1]">{cel || "Formato: +55 (XX) XXXXX-XXXX"}</span>
+                  <span className="text-[10px] text-[#3D4F5F] font-medium">
+                    {celRaw.length > 0 ? `Resultado: ${cel}` : "Digite DDD + número (ex: 11999990000)"}
+                  </span>
                   {celErr && <span className="text-[10px] text-red-500 font-medium">DDD inválido</span>}
-                  {celRaw.length >= 2 && !celErr && isComplete(celRaw, true) && <span className="text-[10px] text-emerald-600 font-medium">Válido</span>}
+                  {celRaw.length >= 2 && !celErr && isComplete(celRaw, true) && <span className="text-[10px] text-emerald-600 font-medium">Válido ✓</span>}
                 </div>
               </div>
 
               {/* Email */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
+                <Label htmlFor="emailUser" className="text-xs font-semibold text-[#3D4F5F] uppercase tracking-wider flex items-center gap-2">
                   <Mail className="w-3.5 h-3.5" /> E-mail corporativo
                 </Label>
-                <Input id="email" type="email" placeholder="maria.silva@assistants.com.br" value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="h-11 border-[#E7E9EB] focus:border-[#E67E22] focus:ring-[#E67E22]/20 text-[#0B1929] placeholder:text-[#B0B8C1]" />
+                <div className="flex items-center h-11 rounded-md border border-[#E7E9EB] focus-within:border-[#E67E22] focus-within:ring-1 focus-within:ring-[#E67E22]/20 overflow-hidden bg-white">
+                  <input
+                    id="emailUser"
+                    type="text"
+                    placeholder="maria.silva"
+                    value={emailUser}
+                    onChange={onEmailUser}
+                    className="flex-1 h-full px-3 text-sm text-[#0B1929] placeholder:text-[#B0B8C1] outline-none border-none bg-transparent"
+                  />
+                  <span className="px-3 text-sm text-[#3D4F5F] bg-[#F4F5F7] h-full flex items-center border-l border-[#E7E9EB] font-medium select-none whitespace-nowrap">
+                    {EMAIL_DOMAIN}
+                  </span>
+                </div>
+                {emailUser && (
+                  <span className="text-[10px] text-[#B0B8C1]">Resultado: {fullEmail}</span>
+                )}
               </div>
 
               <Separator className="bg-[#E7E9EB]" />
