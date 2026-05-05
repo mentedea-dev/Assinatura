@@ -132,7 +132,33 @@ export default function Home() {
     if (!f) return;
     if (f.size > 500000) { toast.error("Máximo 500 KB."); return; }
     const r = new FileReader();
-    r.onload = (ev) => setFotoUrl(ev.target?.result as string);
+    r.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      // Crop photo to circular shape via Canvas so Outlook renders it round
+      // (Outlook ignores border-radius CSS)
+      const img = document.createElement('img');
+      img.onload = () => {
+        const size = 112; // 2x of 56px display for retina clarity
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d')!;
+        // Draw circular clip
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        // Draw image centered and covering the circle
+        const scale = Math.max(size / img.width, size / img.height);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        const x = (size - w) / 2;
+        const y = (size - h) / 2;
+        ctx.drawImage(img, x, y, w, h);
+        setFotoUrl(canvas.toDataURL('image/png'));
+      };
+      img.src = dataUrl;
+    };
     r.readAsDataURL(f);
   }, []);
 
@@ -176,7 +202,7 @@ export default function Home() {
     const wmSrc = wordmarkB64;
 
     const photoHTML = foto
-      ? `<img src="${imgSrc}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:0;" />`
+      ? `<img src="${imgSrc}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border:0;" />`
       : `<img src="${imgSrc}" alt="A" width="${symbolSize}" height="${symbolSize}" style="display:block;width:${symbolSize}px;height:${symbolSize}px;border:0;" />`;
 
     const parts = [
@@ -680,7 +706,7 @@ export default function Home() {
                       <tr>
                         <td style={{ verticalAlign: "top", padding: 0, width: foto ? 56 : 44, border: "none" }}>
                           {foto && fotoUrl ? (
-                            <img src={fotoUrl} alt="Foto" width={56} height={56} style={{ display: "block", border: 0, width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }} />
+                            <img src={fotoUrl} alt="Foto" width={56} height={56} style={{ display: "block", border: 0, width: 56, height: 56 }} />
                           ) : (
                             <img src={symbolB64 || SYMBOL_URL} alt="A" width={44} height={44} style={{ display: "block", border: 0, width: 44, height: 44 }} />
                           )}
