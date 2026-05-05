@@ -475,7 +475,7 @@ export default function Home() {
       <header className="border-b border-[#E7E9EB] bg-white">
         <div className="container flex items-center justify-between h-14">
           <div className="flex items-center gap-4">
-            <img src={WORDMARK_URL} alt="Assistants Consulting" className="h-6 w-auto" />
+            <img src={SIG_WORDMARK_B64} alt="Assistants Consulting" className="h-6 w-auto" />
             <Separator orientation="vertical" className="h-5 bg-[#E7E9EB]" />
             <span className="text-sm font-medium text-[#3D4F5F] tracking-wide">Gerador de Assinatura</span>
           </div>
