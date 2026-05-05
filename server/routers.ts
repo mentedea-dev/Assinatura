@@ -106,12 +106,50 @@ export const appRouter = router({
           "auxiliar administrativa": "Administrative Assistant",
           "recepcionista": "Receptionist",
           "office manager": "Office Manager",
+          "sócio atuarial": "Actuarial Partner",
+          "sócia atuarial": "Actuarial Partner",
+          "sócio-diretor atuarial": "Managing Actuarial Partner",
+          "sócia-diretora atuarial": "Managing Actuarial Partner",
+          "diretor atuarial": "Actuarial Director",
+          "diretora atuarial": "Actuarial Director",
+          "gerente sênior": "Senior Manager",
+          "consultor atuarial sênior": "Senior Actuarial Consultant",
+          "consultora atuarial sênior": "Senior Actuarial Consultant",
+          "analista de benefícios": "Benefits Analyst",
+          "consultor de benefícios": "Benefits Consultant",
+          "consultora de benefícios": "Benefits Consultant",
+          "consultor de previdência": "Pension Consultant",
+          "consultora de previdência": "Pension Consultant",
+          "analista de previdência": "Pension Analyst",
+          "analista de saúde suplementar": "Supplementary Health Analyst",
+          "consultor de saúde suplementar": "Supplementary Health Consultant",
+          "consultora de saúde suplementar": "Supplementary Health Consultant",
+          "gerente de operações": "Operations Manager",
+          "gerente comercial": "Commercial Manager",
+          "gerente financeiro": "Financial Manager",
+          "gerente financeira": "Financial Manager",
+          "analista de compliance": "Compliance Analyst",
+          "analista de riscos": "Risk Analyst",
+          "gerente de riscos": "Risk Manager",
+          "diretor de operações": "Chief Operating Officer",
+          "diretora de operações": "Chief Operating Officer",
+          "diretor financeiro": "Chief Financial Officer",
+          "diretora financeira": "Chief Financial Officer",
+          "trainee": "Trainee",
+          "jovem aprendiz": "Apprentice",
+          "especialista": "Specialist",
+          "especialista atuarial": "Actuarial Specialist",
+          "técnico atuarial": "Actuarial Technician",
+          "técnica atuarial": "Actuarial Technician",
         };
 
         const normalizedTitle = input.title.trim().toLowerCase();
         const dictMatch = DICT[normalizedTitle];
 
-        // Try LLM first, fall back to dictionary
+        // Try dictionary first (instant, no network dependency)
+        if (dictMatch) return { translated: dictMatch };
+
+        // Fallback to LLM for titles not in dictionary
         try {
           const response = await invokeLLM({
             messages: [
@@ -140,9 +178,6 @@ Rules:
         } catch (err) {
           console.error("[translate.jobTitle] LLM failed:", err);
         }
-
-        // Fallback to dictionary
-        if (dictMatch) return { translated: dictMatch };
 
         // Last resort: return empty (UI will show placeholder)
         return { translated: "" };
