@@ -138,7 +138,7 @@ export default function Home() {
       // (Outlook ignores border-radius CSS)
       const img = document.createElement('img');
       img.onload = () => {
-        const size = 112; // 2x of 56px display for retina clarity
+        const size = 144; // 2x of 72px display for retina clarity
         const canvas = document.createElement('canvas');
         canvas.width = size;
         canvas.height = size;
@@ -188,7 +188,7 @@ export default function Home() {
    * MUST be defined BEFORE handleDL.
    */
   const genHTML = useCallback(() => {
-    const photoSize = 56;
+    const photoSize = 72;
     const symbolSize = 44;
     const sz = foto ? photoSize : symbolSize;
     const dn = nome || "[Nome Completo]";
@@ -237,7 +237,7 @@ export default function Home() {
    * Uses full Outlook Word engine compatibility.
    */
   const genHTMLForOutlook = useCallback((baseName: string) => {
-    const photoSize = 56;
+    const photoSize = 72;
     const symbolSize = 44;
     const sz = foto ? photoSize : symbolSize;
     const dn = nome || "[Nome Completo]";
@@ -359,7 +359,7 @@ export default function Home() {
    * Optimized for clipboard paste into Outlook's signature editor.
    */
   const genHTMLForClipboard = useCallback(() => {
-    const photoSize = 56;
+    const photoSize = 72;
     const symbolSize = 44;
     const sz = foto ? photoSize : symbolSize;
     const dn = nome || "[Nome Completo]";
@@ -704,9 +704,9 @@ export default function Home() {
                     <tbody>
                       <tr><td colSpan={2} style={{ padding: "0 0 10px 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px", borderLeft: "none", borderRight: "none", borderBottom: "none" }}>&nbsp;</td></tr>
                       <tr>
-                        <td style={{ verticalAlign: "top", padding: 0, width: foto ? 56 : 44, border: "none" }}>
+                        <td style={{ verticalAlign: "top", padding: 0, width: foto ? 72 : 44, border: "none" }}>
                           {foto && fotoUrl ? (
-                            <img src={fotoUrl} alt="Foto" width={56} height={56} style={{ display: "block", border: 0, width: 56, height: 56 }} />
+                            <img src={fotoUrl} alt="Foto" width={72} height={72} style={{ display: "block", border: 0, width: 72, height: 72 }} />
                           ) : (
                             <img src={symbolB64 || SYMBOL_URL} alt="A" width={44} height={44} style={{ display: "block", border: 0, width: 44, height: 44 }} />
                           )}
