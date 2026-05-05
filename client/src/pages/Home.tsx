@@ -327,15 +327,94 @@ export default function Home() {
   }, [genHTMLForOutlook, genTXT, nome, foto, fotoUrl, symbolB64, wordmarkB64, base64ToBytes]);
 
   /**
+   * Generate a full Outlook-optimized HTML document with BASE64 inline images.
+   * This is specifically for clipboard paste into Outlook's signature editor.
+   * Key differences from genHTML():
+   * - Full HTML document with MSO namespaces and OfficeDocumentSettings
+   * - mso-table-lspace/rspace:0pt on all tables
+   * - mso-line-height-rule:exactly on all text cells
+   * - mso-margin-top-alt:0;mso-margin-bottom-alt:0 to prevent paragraph spacing
+   * - No <p> tags (uses nested tables instead) to avoid Word paragraph spacing
+   * - Explicit width/height on all elements
+   * - No border-radius (Outlook ignores it)
+   * - .toUpperCase() instead of text-transform
+   */
+  const genHTMLForClipboard = useCallback(() => {
+    const photoSize = 60;
+    const symbolSize = 44;
+    const sz = foto ? photoSize : symbolSize;
+    const dn = nome || "[Nome Completo]";
+    const dpt = (cargoPT || "[Cargo]").toUpperCase();
+    const den = cargoEN || "[Position]";
+    const df = fixo || "+55 (XX) XXXX-XXXX";
+    const dc = cel || "+55 (XX) XXXXX-XXXX";
+    const de = fullEmail || "nome@assistants.com.br";
+
+    const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
+    const wmSrc = wordmarkB64;
+
+    // Simple square image (no border-radius for Outlook)
+    const photoHTML = `<img src="${imgSrc}" alt="${foto ? 'Foto' : 'A'}" width="${sz}" height="${sz}" style="display:block;width:${sz}px;height:${sz}px;border:0;outline:none;" />`;
+
+    const parts = [
+      `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">`,
+      `<head><meta charset="utf-8"><meta name="Generator" content="Microsoft Word 15">`,
+      `<!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->`,
+      `<style>table{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;}td{border:none;padding:0;mso-line-height-rule:exactly;mso-margin-top-alt:0;mso-margin-bottom-alt:0;mso-padding-alt:0;}p{margin:0;padding:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;mso-line-height-rule:exactly;}img{border:0;outline:none;display:block;}</style>`,
+      `</head>`,
+      `<body style="margin:0;padding:0;word-spacing:normal;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;font-family:Calibri,Arial,Helvetica,sans-serif;width:520px;">`,
+      // Top separator line
+      `<tr><td colspan="3" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
+      // Spacer after top line
+      `<tr><td colspan="3" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      // Main content row: photo | orange bar | info
+      `<tr>`,
+      `<td valign="top" width="${sz}" style="width:${sz}px;padding:0;vertical-align:top;">${photoHTML}</td>`,
+      // Orange bar column with spacers
+      `<td valign="top" width="26" style="width:26px;padding:0;vertical-align:top;"><table cellpadding="0" cellspacing="0" border="0" width="26" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:26px;"><tr><td width="12" style="width:12px;font-size:1px;line-height:${sz}px;mso-line-height-rule:exactly;">&nbsp;</td><td width="2" height="${sz}" bgcolor="#E67E22" style="width:2px;height:${sz}px;font-size:1px;line-height:${sz}px;mso-line-height-rule:exactly;background-color:#E67E22;">&nbsp;</td><td width="12" style="width:12px;font-size:1px;line-height:${sz}px;mso-line-height-rule:exactly;">&nbsp;</td></tr></table></td>`,
+      // Info column
+      `<td valign="top" style="padding:0;vertical-align:top;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;mso-line-height-rule:exactly;padding:0 0 1px 0;">${dn}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#E67E22;line-height:13px;mso-line-height-rule:exactly;padding:0;">${dpt}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;mso-line-height-rule:exactly;padding:0 0 6px 0;font-style:italic;">${den}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="font-weight:bold;color:#0B1929;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="font-weight:bold;color:#0B1929;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="font-weight:bold;color:#0B1929;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
+      `</table></td></tr>`,
+      // Spacer before wordmark
+      `<tr><td colspan="3" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      // Wordmark
+      `<tr><td colspan="3" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="100" height="22" style="display:block;border:0;outline:none;width:100px;height:22px;" /></a></td></tr>`,
+      // Separator line
+      `<tr><td colspan="3" height="8" style="height:8px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="3" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="3" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      // Addresses - using nested table rows instead of <p> tags
+      `<tr><td colspan="3" style="padding:0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><span style="font-weight:bold;">S\u00e3o Paulo</span>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;padding:2px 0 0 0;"><span style="font-weight:bold;">Bras\u00edlia</span>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
+      // Spacer before disclaimer
+      `<tr><td colspan="3" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      // Disclaimer PT - using table cell instead of <p>
+      `<tr><td colspan="3" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr>`,
+      // Spacer
+      `<tr><td colspan="3" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      // Disclaimer EN
+      `<tr><td colspan="3" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;font-style:italic;width:520px;">${AVISO_EN}</td></tr>`,
+      `</table>`,
+      `</body></html>`,
+    ];
+    return parts.join('');
+  }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto, symbolB64, wordmarkB64]);
+
+  /**
    * Copy signature HTML to clipboard using the Clipboard API.
-   * Writes both text/html and text/plain MIME types so Outlook (and other clients)
-   * can paste the rich HTML version directly into the signature editor.
-   * Uses the same genHTML() output (inline base64 images, no whitespace between tags)
-   * which is already validated to avoid extra spacing in Outlook.
+   * Uses genHTMLForClipboard() which produces a full MSO-compatible HTML document
+   * with inline base64 images, optimized for Outlook's Word rendering engine.
    */
   const handleCopy = useCallback(async () => {
     try {
-      const html = genHTML();
+      const html = genHTMLForClipboard();
       const plainText = genTXT();
 
       // Use ClipboardItem API for rich HTML copy
@@ -346,17 +425,18 @@ export default function Home() {
       await navigator.clipboard.write([clipboardItem]);
 
       setCopied(true);
-      toast.success("Assinatura copiada! Cole diretamente no Outlook.");
+      toast.success("Assinatura copiada! Cole no editor de assinaturas do Outlook.");
       setTimeout(() => setCopied(false), 3000);
     } catch (err) {
       console.error("Clipboard write error:", err);
-      // Fallback: try execCommand for older browsers
+      // Fallback: render the HTML in a hidden div and copy via selection
       try {
-        const html = genHTML();
+        const html = genHTMLForClipboard();
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         tempDiv.style.position = 'fixed';
         tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '0';
         tempDiv.style.opacity = '0';
         document.body.appendChild(tempDiv);
         const range = document.createRange();
@@ -368,14 +448,14 @@ export default function Home() {
         sel?.removeAllRanges();
         document.body.removeChild(tempDiv);
         setCopied(true);
-        toast.success("Assinatura copiada! Cole diretamente no Outlook.");
+        toast.success("Assinatura copiada! Cole no editor de assinaturas do Outlook.");
         setTimeout(() => setCopied(false), 3000);
       } catch (fallbackErr) {
         console.error("Fallback copy error:", fallbackErr);
         toast.error("Erro ao copiar. Tente usar o botão de download.");
       }
     }
-  }, [genHTML, genTXT]);
+  }, [genHTMLForClipboard, genTXT]);
 
   // Validation
   const fixoValid = fixoRaw.length === 0 || (isComplete(fixoRaw, false) && isDDDOk(fixoRaw));
