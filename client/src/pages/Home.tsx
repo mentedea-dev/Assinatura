@@ -183,12 +183,11 @@ export default function Home() {
     // Build HTML as array of parts joined without whitespace to avoid Outlook spacing issues
     const parts = [
       `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,Helvetica,sans-serif;max-width:520px;border:none;">`,
-      `<tr><td colspan="3" style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;border-left:none;border-right:none;border-bottom:none;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;border-left:none;border-right:none;border-bottom:none;">&nbsp;</td></tr>`,
       `<tr>`,
       `<td valign="top" style="padding:0;width:${sz}px;border:none;">${photoHTML}</td>`,
-      `<td valign="top" style="padding:0 12px;width:2px;border:none;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;"><tr><td style="background-color:#E67E22;width:2px;height:${sz}px;font-size:1px;line-height:1px;border:none;">&nbsp;</td></tr></table></td>`,
-      `<td valign="top" style="padding:0;border:none;">`,
-      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;">`,
+      `<td valign="top" style="padding:0 0 0 12px;border-left:2px solid #E67E22;border-top:none;border-right:none;border-bottom:none;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;margin-left:10px;">`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;border:none;mso-line-height-rule:exactly;">${dn}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:600;color:#E67E22;line-height:13px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.5px;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
@@ -196,12 +195,12 @@ export default function Home() {
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
-      `<tr><td colspan="3" style="padding:10px 0 0 0;border:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
-      `<tr><td colspan="3" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="180" style="display:block;border:0;width:180px;height:auto;" /></a></td></tr>`,
-      `<tr><td colspan="3" style="padding:8px 0 0 0;border-top:1px solid #E7E9EB;border-left:none;border-right:none;border-bottom:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
-      `<tr><td colspan="3" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:0;line-height:12px;mso-line-height-rule:exactly;"><strong>São Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</p><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:2px 0 0 0;line-height:12px;mso-line-height-rule:exactly;"><strong>Brasília</strong>&nbsp;&nbsp;${ENDERECO_BSB}</p></td></tr>`,
-      `<tr><td colspan="3" style="padding:10px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;mso-line-height-rule:exactly;">${AVISO_PT}</p></td></tr>`,
-      `<tr><td colspan="3" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;font-style:italic;mso-line-height-rule:exactly;">${AVISO_EN}</p></td></tr>`,
+      `<tr><td colspan="2" style="padding:10px 0 0 0;border:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="180" style="display:block;border:0;width:180px;height:auto;" /></a></td></tr>`,
+      `<tr><td colspan="2" style="padding:8px 0 0 0;border-top:1px solid #E7E9EB;border-left:none;border-right:none;border-bottom:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:0;line-height:12px;mso-line-height-rule:exactly;"><strong>São Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</p><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;margin:2px 0 0 0;line-height:12px;mso-line-height-rule:exactly;"><strong>Brasília</strong>&nbsp;&nbsp;${ENDERECO_BSB}</p></td></tr>`,
+      `<tr><td colspan="2" style="padding:10px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;mso-line-height-rule:exactly;">${AVISO_PT}</p></td></tr>`,
+      `<tr><td colspan="2" style="padding:4px 0 0 0;border:none;"><p style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;margin:0;line-height:10px;max-width:520px;font-style:italic;mso-line-height-rule:exactly;">${AVISO_EN}</p></td></tr>`,
       `</table>`,
     ];
     return parts.join('');
@@ -241,12 +240,11 @@ export default function Home() {
       `<title>Assinatura</title></head>`,
       `<body style="margin:0;padding:0;">`,
       `<table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;font-family:Calibri,Arial,Helvetica,sans-serif;width:520px;">`,
-      `<tr><td colspan="3" height="10" style="padding:0;font-size:1px;line-height:1px;border-top:1px solid #E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="10" style="padding:0;font-size:1px;line-height:1px;border-top:1px solid #E7E9EB;">&nbsp;</td></tr>`,
       `<tr>`,
       `<td valign="top" width="${sz}" style="padding:0;width:${sz}px;">${photoHTML}</td>`,
-      `<td valign="top" width="26" style="padding:0;width:26px;"><table cellpadding="0" cellspacing="0" border="0" width="26" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td width="12" style="width:12px;font-size:1px;">&nbsp;</td><td width="2" bgcolor="#E67E22" style="width:2px;font-size:1px;line-height:${sz}px;">&nbsp;</td><td width="12" style="width:12px;font-size:1px;">&nbsp;</td></tr></table></td>`,
-      `<td valign="top" style="padding:0;">`,
-      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">`,
+      `<td valign="top" style="padding:0 0 0 12px;border-left:2px solid #E67E22;mso-border-left-alt:solid #E67E22 2.0pt;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;margin-left:10px;">`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;mso-line-height-rule:exactly;">${dn}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#E67E22;line-height:13px;padding:0;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
@@ -254,12 +252,12 @@ export default function Home() {
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
-      `<tr><td colspan="3" height="10" style="padding:0;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
-      `<tr><td colspan="3" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmFile}" alt="Assistants Consulting" width="180" height="40" style="display:block;border:0;width:180px;height:40px;" /></a></td></tr>`,
-      `<tr><td colspan="3" height="8" style="padding:0;font-size:1px;line-height:1px;border-top:1px solid #E7E9EB;">&nbsp;</td></tr>`,
-      `<tr><td colspan="3" style="padding:4px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><strong>S\u00e3o Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;padding:2px 0 0 0;mso-line-height-rule:exactly;"><strong>Bras\u00edlia</strong>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
-      `<tr><td colspan="3" style="padding:10px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr></table></td></tr>`,
-      `<tr><td colspan="3" style="padding:4px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;font-style:italic;mso-line-height-rule:exactly;width:520px;">${AVISO_EN}</td></tr></table></td></tr>`,
+      `<tr><td colspan="2" height="10" style="padding:0;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmFile}" alt="Assistants Consulting" width="180" height="40" style="display:block;border:0;width:180px;height:40px;" /></a></td></tr>`,
+      `<tr><td colspan="2" height="8" style="padding:0;font-size:1px;line-height:1px;border-top:1px solid #E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" style="padding:4px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><strong>S\u00e3o Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;padding:2px 0 0 0;mso-line-height-rule:exactly;"><strong>Bras\u00edlia</strong>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
+      `<tr><td colspan="2" style="padding:10px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr></table></td></tr>`,
+      `<tr><td colspan="2" style="padding:4px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;font-style:italic;mso-line-height-rule:exactly;width:520px;">${AVISO_EN}</td></tr></table></td></tr>`,
       `</table>`,
       `</body></html>`,
     ];
@@ -365,17 +363,15 @@ export default function Home() {
       `<body style="margin:0;padding:0;word-spacing:normal;">`,
       `<table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;font-family:Calibri,Arial,Helvetica,sans-serif;width:520px;">`,
       // Top separator line
-      `<tr><td colspan="3" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
       // Spacer after top line
-      `<tr><td colspan="3" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      // Main content row: photo | orange bar | info
+      `<tr><td colspan="2" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      // Main content row: photo | info (with border-left as orange bar)
       `<tr>`,
       `<td valign="top" width="${sz}" style="width:${sz}px;padding:0;vertical-align:top;">${photoHTML}</td>`,
-      // Orange bar column with spacers
-      `<td valign="top" width="26" style="width:26px;padding:0;vertical-align:top;"><table cellpadding="0" cellspacing="0" border="0" width="26" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:26px;"><tr><td width="12" style="width:12px;font-size:1px;line-height:${sz}px;mso-line-height-rule:exactly;">&nbsp;</td><td width="2" height="${sz}" bgcolor="#E67E22" style="width:2px;height:${sz}px;font-size:1px;line-height:${sz}px;mso-line-height-rule:exactly;background-color:#E67E22;">&nbsp;</td><td width="12" style="width:12px;font-size:1px;line-height:${sz}px;mso-line-height-rule:exactly;">&nbsp;</td></tr></table></td>`,
-      // Info column
-      `<td valign="top" style="padding:0;vertical-align:top;">`,
-      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">`,
+      // Info column with border-left acting as the orange bar (stretches full height)
+      `<td valign="top" style="padding:0 0 0 12px;vertical-align:top;border-left:2px solid #E67E22;mso-border-left-alt:solid #E67E22 2.0pt;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;margin-left:10px;">`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;mso-line-height-rule:exactly;padding:0 0 1px 0;">${dn}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#E67E22;line-height:13px;mso-line-height-rule:exactly;padding:0;">${dpt}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;mso-line-height-rule:exactly;padding:0 0 6px 0;font-style:italic;">${den}</td></tr>`,
@@ -384,23 +380,23 @@ export default function Home() {
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="font-weight:bold;color:#0B1929;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
       // Spacer before wordmark
-      `<tr><td colspan="3" height="8" style="height:8px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="8" style="height:8px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       // Wordmark (180x40 display, source is 360x81 = 2x density for clarity)
-      `<tr><td colspan="3" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="180" height="40" style="display:block;border:0;outline:none;width:180px;height:40px;" /></a></td></tr>`,
+      `<tr><td colspan="2" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="180" height="40" style="display:block;border:0;outline:none;width:180px;height:40px;" /></a></td></tr>`,
       // Separator line
-      `<tr><td colspan="3" height="6" style="height:6px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      `<tr><td colspan="3" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
-      `<tr><td colspan="3" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="6" style="height:6px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       // Addresses - using nested table rows instead of <p> tags
-      `<tr><td colspan="3" style="padding:0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><span style="font-weight:bold;">S\u00e3o Paulo</span>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;padding:2px 0 0 0;"><span style="font-weight:bold;">Bras\u00edlia</span>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
+      `<tr><td colspan="2" style="padding:0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><span style="font-weight:bold;">S\u00e3o Paulo</span>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;padding:2px 0 0 0;"><span style="font-weight:bold;">Bras\u00edlia</span>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
       // Spacer before disclaimer
-      `<tr><td colspan="3" height="6" style="height:6px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="6" style="height:6px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       // Disclaimer PT - using table cell instead of <p>
-      `<tr><td colspan="3" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr>`,
+      `<tr><td colspan="2" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr>`,
       // Spacer
-      `<tr><td colspan="3" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       // Disclaimer EN
-      `<tr><td colspan="3" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;font-style:italic;width:520px;">${AVISO_EN}</td></tr>`,
+      `<tr><td colspan="2" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;font-style:italic;width:520px;">${AVISO_EN}</td></tr>`,
       `</table>`,
       `</body></html>`,
     ];
@@ -698,7 +694,7 @@ export default function Home() {
                 <div ref={prevRef}>
                   <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", fontFamily: "Calibri, Arial, Helvetica, sans-serif", maxWidth: 520, border: "none" }}>
                     <tbody>
-                      <tr><td colSpan={3} style={{ padding: "0 0 10px 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px", borderLeft: "none", borderRight: "none", borderBottom: "none" }}>&nbsp;</td></tr>
+                      <tr><td colSpan={2} style={{ padding: "0 0 10px 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px", borderLeft: "none", borderRight: "none", borderBottom: "none" }}>&nbsp;</td></tr>
                       <tr>
                         <td style={{ verticalAlign: "top", padding: 0, width: foto ? 60 : 44, border: "none" }}>
                           {foto && fotoUrl ? (
@@ -707,11 +703,8 @@ export default function Home() {
                             <img src={symbolB64 || SYMBOL_URL} alt="A" width={44} height={44} style={{ display: "block", border: 0, width: 44, height: 44 }} />
                           )}
                         </td>
-                        <td style={{ verticalAlign: "top", padding: "0 12px", width: 2, border: "none" }}>
-                          <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", border: "none" }}><tbody><tr><td style={{ backgroundColor: "#E67E22", width: 2, height: foto ? 60 : 44, fontSize: 1, lineHeight: "1px", border: "none" }}>&nbsp;</td></tr></tbody></table>
-                        </td>
-                        <td style={{ verticalAlign: "top", padding: 0, border: "none" }}>
-                          <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", border: "none" }}>
+                        <td style={{ verticalAlign: "top", padding: "0 0 0 12px", borderLeft: "2px solid #E67E22", borderTop: "none", borderRight: "none", borderBottom: "none" }}>
+                          <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", border: "none", marginLeft: 10 }}>
                             <tbody>
                               <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 14, fontWeight: 700, color: "#0B1929", lineHeight: "18px", padding: "0 0 1px 0", border: "none" }}>{dNome}</td></tr>
                               <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 10, fontWeight: 600, color: "#E67E22", lineHeight: "13px", padding: 0, textTransform: "uppercase", letterSpacing: "0.5px", border: "none" }}>{dPT}</td></tr>
@@ -723,15 +716,15 @@ export default function Home() {
                           </table>
                         </td>
                       </tr>
-                      <tr><td colSpan={3} style={{ padding: "10px 0 0 0", fontSize: 1, lineHeight: "1px", border: "none" }}>&nbsp;</td></tr>
-                      <tr><td colSpan={3} style={{ padding: 0, border: "none" }}><a href="https://www.assistants.com.br" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}><img src={wordmarkB64 || SIG_WORDMARK_URL} alt="Assistants Consulting" width={180} style={{ display: "block", border: 0, width: 180, height: "auto" }} /></a></td></tr>
-                      <tr><td colSpan={3} style={{ padding: "8px 0 0 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px", borderLeft: "none", borderRight: "none", borderBottom: "none" }}>&nbsp;</td></tr>
-                      <tr><td colSpan={3} style={{ padding: "4px 0 0 0", border: "none" }}>
+                      <tr><td colSpan={2} style={{ padding: "10px 0 0 0", fontSize: 1, lineHeight: "1px", border: "none" }}>&nbsp;</td></tr>
+                      <tr><td colSpan={2} style={{ padding: 0, border: "none" }}><a href="https://www.assistants.com.br" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}><img src={wordmarkB64 || SIG_WORDMARK_URL} alt="Assistants Consulting" width={180} style={{ display: "block", border: 0, width: 180, height: "auto" }} /></a></td></tr>
+                      <tr><td colSpan={2} style={{ padding: "8px 0 0 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px", borderLeft: "none", borderRight: "none", borderBottom: "none" }}>&nbsp;</td></tr>
+                      <tr><td colSpan={2} style={{ padding: "4px 0 0 0", border: "none" }}>
                         <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 8, color: "#6B7B8D", margin: 0, lineHeight: "12px" }}><strong>São Paulo</strong>&nbsp;&nbsp;{ENDERECO_SP}</p>
                         <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 8, color: "#6B7B8D", margin: "2px 0 0 0", lineHeight: "12px" }}><strong>Brasília</strong>&nbsp;&nbsp;{ENDERECO_BSB}</p>
                       </td></tr>
-                      <tr><td colSpan={3} style={{ padding: "10px 0 0 0", border: "none" }}><p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 7, color: "#B0B8C1", margin: 0, lineHeight: "10px", maxWidth: 520 }}>{AVISO_PT}</p></td></tr>
-                      <tr><td colSpan={3} style={{ padding: "4px 0 0 0", border: "none" }}><p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 7, color: "#B0B8C1", margin: 0, lineHeight: "10px", maxWidth: 520, fontStyle: "italic" }}>{AVISO_EN}</p></td></tr>
+                      <tr><td colSpan={2} style={{ padding: "10px 0 0 0", border: "none" }}><p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 7, color: "#B0B8C1", margin: 0, lineHeight: "10px", maxWidth: 520 }}>{AVISO_PT}</p></td></tr>
+                      <tr><td colSpan={2} style={{ padding: "4px 0 0 0", border: "none" }}><p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 7, color: "#B0B8C1", margin: 0, lineHeight: "10px", maxWidth: 520, fontStyle: "italic" }}>{AVISO_EN}</p></td></tr>
                     </tbody>
                   </table>
                 </div>
