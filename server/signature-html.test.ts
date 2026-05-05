@@ -2,6 +2,8 @@
  * Regression test: Validate that the signature HTML generation logic
  * produces clean, single-line HTML without whitespace between tags.
  * This prevents Outlook from rendering extra spaces when the signature is pasted.
+ * 
+ * Big4/Interbrand design: no orange bar, clean typographic hierarchy.
  */
 import { describe, it, expect } from "vitest";
 
@@ -18,7 +20,7 @@ function genHTML(opts: {
   wordmarkB64: string;
   fotoUrl?: string;
 }) {
-  const photoSize = 60;
+  const photoSize = 56;
   const symbolSize = 44;
   const sz = opts.foto ? photoSize : symbolSize;
   const dn = opts.nome || "[Nome Completo]";
@@ -32,7 +34,7 @@ function genHTML(opts: {
   const wmSrc = opts.wordmarkB64;
 
   const photoHTML = opts.foto
-    ? `<img src="${imgSrc}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:1px solid #E7E9EB;" />`
+    ? `<img src="${imgSrc}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:0;" />`
     : `<img src="${imgSrc}" alt="A" width="${symbolSize}" height="${symbolSize}" style="display:block;width:${symbolSize}px;height:${symbolSize}px;border:0;" />`;
 
   const ENDERECO_SP = "Rua Cláudio Soares, 72 - 8º andar - Pinheiros - São Paulo/SP - CEP: 05422-030";
@@ -45,14 +47,14 @@ function genHTML(opts: {
     `<tr><td colspan="2" style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;border-left:none;border-right:none;border-bottom:none;">&nbsp;</td></tr>`,
     `<tr>`,
     `<td valign="top" style="padding:0;width:${sz}px;border:none;">${photoHTML}</td>`,
-    `<td valign="top" style="padding:0 0 0 12px;border-left:2px solid #E67E22;border-top:none;border-right:none;border-bottom:none;">`,
-    `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;margin-left:10px;">`,
+    `<td valign="top" style="padding:0 0 0 14px;border:none;">`,
+    `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;">`,
     `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;border:none;mso-line-height-rule:exactly;">${dn}</td></tr>`,
-    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:600;color:#E67E22;line-height:13px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.5px;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
-    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
-    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">T</strong>&nbsp;&nbsp;${df}</td></tr>`,
-    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>`,
-    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
+    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:bold;color:#0B1929;line-height:12px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.8px;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
+    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:normal;color:#6B7B8D;line-height:12px;padding:0 0 8px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
+    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
+    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
+    `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
     `</table></td></tr>`,
     `<tr><td colspan="2" style="padding:10px 0 0 0;border:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
     `<tr><td colspan="2" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="180" style="display:block;border:0;width:180px;height:auto;" /></a></td></tr>`,
@@ -86,10 +88,7 @@ describe("Signature HTML generation", () => {
 
   it("should produce HTML without whitespace-only text nodes between tags", () => {
     const html = genHTML(baseOpts);
-    // Check there's no "> <" pattern (space between closing and opening tags)
-    // Allowed: ">&nbsp;<" and "> text<" (actual content)
     const betweenTags = html.match(/>\s+</g) || [];
-    // Filter out legitimate content (e.g., ">São Paulo<")
     const problematic = betweenTags.filter(m => m.trim() === '><' || /^>\s+<$/.test(m));
     expect(problematic).toHaveLength(0);
   });
@@ -118,5 +117,37 @@ describe("Signature HTML generation", () => {
     const html = genHTML(baseOpts);
     expect(html).toContain('border="0"');
     expect(html).toContain("border-collapse:collapse");
+  });
+
+  it("should NOT contain orange bar (border-left with #E67E22)", () => {
+    const html = genHTML(baseOpts);
+    expect(html).not.toContain("border-left:2px solid #E67E22");
+  });
+
+  it("should use navy color for cargo PT (not orange)", () => {
+    const html = genHTML(baseOpts);
+    expect(html).toContain("color:#0B1929");
+    // Cargo line should not use orange
+    expect(html).not.toContain('color:#E67E22;line-height:13px');
+  });
+
+  it("should use orange only for email link", () => {
+    const html = genHTML(baseOpts);
+    // Only the email link should be orange
+    const orangeMatches = html.match(/color:#E67E22/g) || [];
+    // Should be exactly 1 (the email link)
+    expect(orangeMatches.length).toBe(1);
+  });
+
+  it("should use photo size 56 and symbol size 44", () => {
+    const htmlWithPhoto = genHTML({ ...baseOpts, foto: true, fotoUrl: "data:image/png;base64,PHOTO" });
+    expect(htmlWithPhoto).toContain('width="56"');
+    const htmlNoPhoto = genHTML(baseOpts);
+    expect(htmlNoPhoto).toContain('width="44"');
+  });
+
+  it("should use wordmark width 180", () => {
+    const html = genHTML(baseOpts);
+    expect(html).toContain('width="180"');
   });
 });

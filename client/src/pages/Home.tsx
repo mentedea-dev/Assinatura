@@ -157,10 +157,12 @@ export default function Home() {
 
   /**
    * Generate the HTML signature with BASE64 INLINE images (for preview / simple download).
+   * Big4/Interbrand design: no orange bar, clean typographic hierarchy.
+   * Orange accent only on email link and logo.
    * MUST be defined BEFORE handleDL.
    */
   const genHTML = useCallback(() => {
-    const photoSize = 60;
+    const photoSize = 56;
     const symbolSize = 44;
     const sz = foto ? photoSize : symbolSize;
     const dn = nome || "[Nome Completo]";
@@ -170,30 +172,26 @@ export default function Home() {
     const dc = cel || "+55 (XX) XXXXX-XXXX";
     const de = fullEmail || "nome@assistants.com.br";
 
-    // For the photo: use the uploaded base64 photo, or the symbol base64
     const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
-    // Wordmark: always base64
     const wmSrc = wordmarkB64;
 
-    // Photo HTML: circular for photo, square for symbol
     const photoHTML = foto
-      ? `<img src="${imgSrc}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:1px solid #E7E9EB;" />`
+      ? `<img src="${imgSrc}" alt="Foto" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:0;" />`
       : `<img src="${imgSrc}" alt="A" width="${symbolSize}" height="${symbolSize}" style="display:block;width:${symbolSize}px;height:${symbolSize}px;border:0;" />`;
 
-    // Build HTML as array of parts joined without whitespace to avoid Outlook spacing issues
     const parts = [
       `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Calibri,Arial,Helvetica,sans-serif;max-width:520px;border:none;">`,
       `<tr><td colspan="2" style="padding:0 0 10px 0;border-top:1px solid #E7E9EB;font-size:1px;line-height:1px;border-left:none;border-right:none;border-bottom:none;">&nbsp;</td></tr>`,
       `<tr>`,
       `<td valign="top" style="padding:0;width:${sz}px;border:none;">${photoHTML}</td>`,
-      `<td valign="top" style="padding:0 0 0 12px;border-left:2px solid #E67E22;border-top:none;border-right:none;border-bottom:none;">`,
-      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;margin-left:10px;">`,
+      `<td valign="top" style="padding:0 0 0 14px;border:none;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:none;">`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;border:none;mso-line-height-rule:exactly;">${dn}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:600;color:#E67E22;line-height:13px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.5px;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">T</strong>&nbsp;&nbsp;${df}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:bold;color:#0B1929;line-height:12px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.8px;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:normal;color:#6B7B8D;line-height:12px;padding:0 0 8px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
       `<tr><td colspan="2" style="padding:10px 0 0 0;border:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
       `<tr><td colspan="2" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="180" style="display:block;border:0;width:180px;height:auto;" /></a></td></tr>`,
@@ -209,15 +207,15 @@ export default function Home() {
 
   /**
    * Generate the HTML signature with RELATIVE image paths for Outlook _files folder.
-   * Uses full Outlook Word engine compatibility: no border-radius, no text-transform,
-   * explicit widths, MSO namespaces, bgcolor attributes, no <p> margins.
+   * Big4/Interbrand design: no orange bar, clean typographic hierarchy.
+   * Uses full Outlook Word engine compatibility.
    */
   const genHTMLForOutlook = useCallback((baseName: string) => {
-    const photoSize = 60;
+    const photoSize = 56;
     const symbolSize = 44;
     const sz = foto ? photoSize : symbolSize;
     const dn = nome || "[Nome Completo]";
-    const dpt = (cargoPT || "[Cargo]").toUpperCase(); // Outlook ignores text-transform
+    const dpt = (cargoPT || "[Cargo]").toUpperCase();
     const den = cargoEN || "[Position]";
     const df = fixo || "+55 (XX) XXXX-XXXX";
     const dc = cel || "+55 (XX) XXXXX-XXXX";
@@ -230,7 +228,6 @@ export default function Home() {
     const imgFile = `${baseName}_files/image001.${imgExt}`;
     const wmFile = `${baseName}_files/image002.${wmExt}`;
 
-    // No border-radius in Outlook; use simple square image
     const photoHTML = `<img src="${imgFile}" alt="${foto ? 'Foto' : 'A'}" width="${sz}" height="${sz}" style="display:block;width:${sz}px;height:${sz}px;border:0;" />`;
 
     const parts = [
@@ -240,24 +237,29 @@ export default function Home() {
       `<title>Assinatura</title></head>`,
       `<body style="margin:0;padding:0;">`,
       `<table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;font-family:Calibri,Arial,Helvetica,sans-serif;width:520px;">`,
-      `<tr><td colspan="2" height="10" style="padding:0;font-size:1px;line-height:1px;border-top:1px solid #E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       `<tr>`,
       `<td valign="top" width="${sz}" style="padding:0;width:${sz}px;">${photoHTML}</td>`,
-      `<td valign="top" style="padding:0 0 0 12px;border-left:2px solid #E67E22;mso-border-left-alt:solid #E67E22 2.0pt;">`,
-      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;margin-left:10px;">`,
+      `<td valign="top" style="padding:0 0 0 14px;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;padding:0 0 1px 0;mso-line-height-rule:exactly;">${dn}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#E67E22;line-height:13px;padding:0;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;padding:0 0 6px 0;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">T</strong>&nbsp;&nbsp;${df}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">M</strong>&nbsp;&nbsp;${dc}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><strong style="color:#0B1929;">E</strong>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:bold;color:#0B1929;line-height:12px;padding:0;mso-line-height-rule:exactly;letter-spacing:0.8px;">${dpt}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:normal;color:#6B7B8D;line-height:12px;padding:0 0 8px 0;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
-      `<tr><td colspan="2" height="10" style="padding:0;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       `<tr><td colspan="2" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmFile}" alt="Assistants Consulting" width="180" height="40" style="display:block;border:0;width:180px;height:40px;" /></a></td></tr>`,
-      `<tr><td colspan="2" height="8" style="padding:0;font-size:1px;line-height:1px;border-top:1px solid #E7E9EB;">&nbsp;</td></tr>`,
-      `<tr><td colspan="2" style="padding:4px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><strong>S\u00e3o Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;padding:2px 0 0 0;mso-line-height-rule:exactly;"><strong>Bras\u00edlia</strong>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
-      `<tr><td colspan="2" style="padding:10px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr></table></td></tr>`,
-      `<tr><td colspan="2" style="padding:4px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;font-style:italic;mso-line-height-rule:exactly;width:520px;">${AVISO_EN}</td></tr></table></td></tr>`,
+      `<tr><td colspan="2" height="8" style="height:8px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" style="padding:0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><strong>S\u00e3o Paulo</strong>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;padding:2px 0 0 0;mso-line-height-rule:exactly;"><strong>Bras\u00edlia</strong>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
+      `<tr><td colspan="2" height="6" style="height:6px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" style="padding:0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr></table></td></tr>`,
+      `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" style="padding:0;"><table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;width:520px;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;font-style:italic;mso-line-height-rule:exactly;width:520px;">${AVISO_EN}</td></tr></table></td></tr>`,
       `</table>`,
       `</body></html>`,
     ];
@@ -326,19 +328,12 @@ export default function Home() {
 
   /**
    * Generate a full Outlook-optimized HTML document with BASE64 inline images.
-   * This is specifically for clipboard paste into Outlook's signature editor.
-   * Key differences from genHTML():
-   * - Full HTML document with MSO namespaces and OfficeDocumentSettings
-   * - mso-table-lspace/rspace:0pt on all tables
-   * - mso-line-height-rule:exactly on all text cells
-   * - mso-margin-top-alt:0;mso-margin-bottom-alt:0 to prevent paragraph spacing
-   * - No <p> tags (uses nested tables instead) to avoid Word paragraph spacing
-   * - Explicit width/height on all elements
-   * - No border-radius (Outlook ignores it)
-   * - .toUpperCase() instead of text-transform
+   * Big4/Interbrand design: no orange bar, clean typographic hierarchy.
+   * Orange accent only on email link and logo.
+   * Optimized for clipboard paste into Outlook's signature editor.
    */
   const genHTMLForClipboard = useCallback(() => {
-    const photoSize = 60;
+    const photoSize = 56;
     const symbolSize = 44;
     const sz = foto ? photoSize : symbolSize;
     const dn = nome || "[Nome Completo]";
@@ -351,51 +346,38 @@ export default function Home() {
     const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
     const wmSrc = wordmarkB64;
 
-    // Simple square image (no border-radius for Outlook)
     const photoHTML = `<img src="${imgSrc}" alt="${foto ? 'Foto' : 'A'}" width="${sz}" height="${sz}" style="display:block;width:${sz}px;height:${sz}px;border:0;outline:none;" />`;
 
     const parts = [
       `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">`,
       `<head><meta charset="utf-8"><meta name="Generator" content="Microsoft Word 15">`,
       `<!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->`,
-      `<style>table{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;}td{border:none;padding:0;mso-line-height-rule:exactly;mso-margin-top-alt:0;mso-margin-bottom-alt:0;mso-padding-alt:0;}p{margin:0;padding:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;mso-line-height-rule:exactly;}img{border:0;outline:none;display:block;}</style>`,
+      `<style>table{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;}td{border:none;padding:0;mso-line-height-rule:exactly;mso-margin-top-alt:0;mso-margin-bottom-alt:0;mso-padding-alt:0;}img{border:0;outline:none;display:block;}</style>`,
       `</head>`,
       `<body style="margin:0;padding:0;word-spacing:normal;">`,
       `<table cellpadding="0" cellspacing="0" border="0" width="520" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;font-family:Calibri,Arial,Helvetica,sans-serif;width:520px;">`,
-      // Top separator line
       `<tr><td colspan="2" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
-      // Spacer after top line
       `<tr><td colspan="2" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      // Main content row: photo | info (with border-left as orange bar)
       `<tr>`,
       `<td valign="top" width="${sz}" style="width:${sz}px;padding:0;vertical-align:top;">${photoHTML}</td>`,
-      // Info column with border-left acting as the orange bar (stretches full height)
-      `<td valign="top" style="padding:0 0 0 12px;vertical-align:top;border-left:2px solid #E67E22;mso-border-left-alt:solid #E67E22 2.0pt;">`,
-      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;margin-left:10px;">`,
+      `<td valign="top" style="padding:0 0 0 14px;vertical-align:top;">`,
+      `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#0B1929;line-height:18px;mso-line-height-rule:exactly;padding:0 0 1px 0;">${dn}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#E67E22;line-height:13px;mso-line-height-rule:exactly;padding:0;">${dpt}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:10px;font-weight:normal;color:#6B7B8D;line-height:13px;mso-line-height-rule:exactly;padding:0 0 6px 0;font-style:italic;">${den}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="font-weight:bold;color:#0B1929;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="font-weight:bold;color:#0B1929;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="font-weight:bold;color:#0B1929;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:bold;color:#0B1929;line-height:12px;mso-line-height-rule:exactly;padding:0;letter-spacing:0.8px;">${dpt}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:normal;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;padding:0 0 8px 0;font-style:italic;">${den}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="color:#6B7B8D;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
+      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="color:#6B7B8D;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
-      // Spacer before wordmark
-      `<tr><td colspan="2" height="8" style="height:8px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      // Wordmark (180x40 display, source is 360x81 = 2x density for clarity)
+      `<tr><td colspan="2" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       `<tr><td colspan="2" style="padding:0;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="180" height="40" style="display:block;border:0;outline:none;width:180px;height:40px;" /></a></td></tr>`,
-      // Separator line
-      `<tr><td colspan="2" height="6" style="height:6px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
+      `<tr><td colspan="2" height="8" style="height:8px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       `<tr><td colspan="2" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
       `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      // Addresses - using nested table rows instead of <p> tags
       `<tr><td colspan="2" style="padding:0;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><span style="font-weight:bold;">S\u00e3o Paulo</span>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;padding:2px 0 0 0;"><span style="font-weight:bold;">Bras\u00edlia</span>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
-      // Spacer before disclaimer
       `<tr><td colspan="2" height="6" style="height:6px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      // Disclaimer PT - using table cell instead of <p>
       `<tr><td colspan="2" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr>`,
-      // Spacer
       `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      // Disclaimer EN
       `<tr><td colspan="2" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;font-style:italic;width:520px;">${AVISO_EN}</td></tr>`,
       `</table>`,
       `</body></html>`,
@@ -690,28 +672,28 @@ export default function Home() {
                   <p className="text-sm text-[#3D4F5F]">Atenciosamente,</p>
                 </div>
 
-                {/* SIGNATURE PREVIEW — uses the same structure as genHTML but with React JSX */}
+                {/* SIGNATURE PREVIEW — Big4/Interbrand design: no orange bar, clean hierarchy */}
                 <div ref={prevRef}>
                   <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", fontFamily: "Calibri, Arial, Helvetica, sans-serif", maxWidth: 520, border: "none" }}>
                     <tbody>
                       <tr><td colSpan={2} style={{ padding: "0 0 10px 0", borderTop: "1px solid #E7E9EB", fontSize: 1, lineHeight: "1px", borderLeft: "none", borderRight: "none", borderBottom: "none" }}>&nbsp;</td></tr>
                       <tr>
-                        <td style={{ verticalAlign: "top", padding: 0, width: foto ? 60 : 44, border: "none" }}>
+                        <td style={{ verticalAlign: "top", padding: 0, width: foto ? 56 : 44, border: "none" }}>
                           {foto && fotoUrl ? (
-                            <img src={fotoUrl} alt="Foto" width={60} height={60} style={{ display: "block", border: "1px solid #E7E9EB", width: 60, height: 60, borderRadius: "50%", objectFit: "cover" }} />
+                            <img src={fotoUrl} alt="Foto" width={56} height={56} style={{ display: "block", border: 0, width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }} />
                           ) : (
                             <img src={symbolB64 || SYMBOL_URL} alt="A" width={44} height={44} style={{ display: "block", border: 0, width: 44, height: 44 }} />
                           )}
                         </td>
-                        <td style={{ verticalAlign: "top", padding: "0 0 0 12px", borderLeft: "2px solid #E67E22", borderTop: "none", borderRight: "none", borderBottom: "none" }}>
-                          <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", border: "none", marginLeft: 10 }}>
+                        <td style={{ verticalAlign: "top", padding: "0 0 0 14px", border: "none" }}>
+                          <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse", border: "none" }}>
                             <tbody>
                               <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 14, fontWeight: 700, color: "#0B1929", lineHeight: "18px", padding: "0 0 1px 0", border: "none" }}>{dNome}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 10, fontWeight: 600, color: "#E67E22", lineHeight: "13px", padding: 0, textTransform: "uppercase", letterSpacing: "0.5px", border: "none" }}>{dPT}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 10, fontWeight: 400, color: "#6B7B8D", lineHeight: "13px", padding: "0 0 6px 0", fontStyle: "italic", border: "none" }}>{translating ? "Translating..." : dEN}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><strong style={{ color: "#0B1929" }}>T</strong>&nbsp;&nbsp;{dFixo}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><strong style={{ color: "#0B1929" }}>M</strong>&nbsp;&nbsp;{dCel}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><strong style={{ color: "#0B1929" }}>E</strong>&nbsp;&nbsp;<a href={`mailto:${dEmail}`} style={{ color: "#E67E22", textDecoration: "none" }}>{dEmail}</a></td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 9, fontWeight: 700, color: "#0B1929", lineHeight: "12px", padding: 0, textTransform: "uppercase", letterSpacing: "0.8px", border: "none" }}>{dPT}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 9, fontWeight: 400, color: "#6B7B8D", lineHeight: "12px", padding: "0 0 8px 0", fontStyle: "italic", border: "none" }}>{translating ? "Translating..." : dEN}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><span style={{ color: "#6B7B8D" }}>T</span>&nbsp;&nbsp;{dFixo}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><span style={{ color: "#6B7B8D" }}>M</span>&nbsp;&nbsp;{dCel}</td></tr>
+                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><span style={{ color: "#6B7B8D" }}>E</span>&nbsp;&nbsp;<a href={`mailto:${dEmail}`} style={{ color: "#E67E22", textDecoration: "none" }}>{dEmail}</a></td></tr>
                             </tbody>
                           </table>
                         </td>
