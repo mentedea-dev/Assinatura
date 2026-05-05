@@ -14,7 +14,7 @@ import { trpc } from "@/lib/trpc";
 import { SIG_SYMBOL_B64, SIG_WORDMARK_B64 } from "@shared/signatureAssets";
 import {
   Upload, User, Mail, Phone, Briefcase,
-  Download, Image, Smartphone, Loader2, FolderArchive,
+  Download, Image, Smartphone, Loader2, FolderArchive, Copy, ClipboardCheck,
 } from "lucide-react";
 import JSZip from "jszip";
 
@@ -79,6 +79,7 @@ export default function Home() {
   const [fotoUrl, setFotoUrl] = useState<string | null>(null);
 
   const [translating, setTranslating] = useState(false);
+  const [copied, setCopied] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const prevRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -325,6 +326,57 @@ export default function Home() {
     }
   }, [genHTMLForOutlook, genTXT, nome, foto, fotoUrl, symbolB64, wordmarkB64, base64ToBytes]);
 
+  /**
+   * Copy signature HTML to clipboard using the Clipboard API.
+   * Writes both text/html and text/plain MIME types so Outlook (and other clients)
+   * can paste the rich HTML version directly into the signature editor.
+   * Uses the same genHTML() output (inline base64 images, no whitespace between tags)
+   * which is already validated to avoid extra spacing in Outlook.
+   */
+  const handleCopy = useCallback(async () => {
+    try {
+      const html = genHTML();
+      const plainText = genTXT();
+
+      // Use ClipboardItem API for rich HTML copy
+      const clipboardItem = new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([plainText], { type: 'text/plain' }),
+      });
+      await navigator.clipboard.write([clipboardItem]);
+
+      setCopied(true);
+      toast.success("Assinatura copiada! Cole diretamente no Outlook.");
+      setTimeout(() => setCopied(false), 3000);
+    } catch (err) {
+      console.error("Clipboard write error:", err);
+      // Fallback: try execCommand for older browsers
+      try {
+        const html = genHTML();
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        tempDiv.style.position = 'fixed';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.opacity = '0';
+        document.body.appendChild(tempDiv);
+        const range = document.createRange();
+        range.selectNodeContents(tempDiv);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        document.execCommand('copy');
+        sel?.removeAllRanges();
+        document.body.removeChild(tempDiv);
+        setCopied(true);
+        toast.success("Assinatura copiada! Cole diretamente no Outlook.");
+        setTimeout(() => setCopied(false), 3000);
+      } catch (fallbackErr) {
+        console.error("Fallback copy error:", fallbackErr);
+        toast.error("Erro ao copiar. Tente usar o botão de download.");
+      }
+    }
+  }, [genHTML, genTXT]);
+
   // Validation
   const fixoValid = fixoRaw.length === 0 || (isComplete(fixoRaw, false) && isDDDOk(fixoRaw));
   const celValid = celRaw.length === 0 || (isComplete(celRaw, true) && isDDDOk(celRaw));
@@ -476,10 +528,14 @@ export default function Home() {
               )}
             </div>
 
-            {/* Button */}
+            {/* Buttons */}
             <div className="flex gap-3">
-              <Button onClick={handleDL} disabled={!phonesOk} className="flex-1 h-12 bg-[#0B1929] hover:bg-[#162a40] text-white font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                <FolderArchive className="w-4 h-4 mr-2" /> Baixar pacote de assinatura (.zip)
+              <Button onClick={handleCopy} disabled={!phonesOk} className={`flex-1 h-12 font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${copied ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-[#E67E22] hover:bg-[#D35400] text-white'}`}>
+                {copied ? <ClipboardCheck className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                {copied ? 'Copiada!' : 'Copiar para Outlook'}
+              </Button>
+              <Button onClick={handleDL} disabled={!phonesOk} variant="outline" className="flex-1 h-12 border-[#E7E9EB] text-[#3D4F5F] hover:bg-[#F4F5F7] font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <FolderArchive className="w-4 h-4 mr-2" /> Baixar pacote (.zip)
               </Button>
             </div>
 
@@ -489,9 +545,23 @@ export default function Home() {
               </p>
             )}
 
-            {/* Instructions */}
+            {/* Instructions - Copy method */}
+            <div className="bg-[#EEF7ED] border border-[#C3E6C3] rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-[#0B1929] mb-3">Método rápido — Copiar e colar</h3>
+              <ol className="text-xs text-[#3D4F5F] space-y-2 list-decimal list-inside leading-relaxed">
+                <li>Preencha seus dados acima e clique em <strong>Copiar para Outlook</strong>.</li>
+                <li>No Outlook, vá em:
+                  <div className="bg-[#F3F4F6] border border-[#E5E7EB] rounded-md px-3 py-2 mt-1.5 mb-1 font-mono text-[11px] text-[#1F2937]">Arquivo &gt; Opções &gt; Email &gt; Assinaturas</div>
+                </li>
+                <li>Clique em <strong>Novo</strong> e dê um nome à assinatura.</li>
+                <li>No campo de edição, pressione <strong>Ctrl + V</strong> para colar.</li>
+                <li>Clique em <strong>OK</strong> e pronto.</li>
+              </ol>
+            </div>
+
+            {/* Instructions - ZIP method */}
             <div className="bg-[#FDF6EE] border border-[#F5DFC3] rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-[#0B1929] mb-3">Outlook clássico para Windows</h3>
+              <h3 className="text-sm font-semibold text-[#0B1929] mb-3">Método alternativo — Pacote .zip</h3>
               <ol className="text-xs text-[#3D4F5F] space-y-2 list-decimal list-inside leading-relaxed">
                 <li>Feche o Outlook.</li>
                 <li>Pressione <strong>Win + R</strong>.</li>
