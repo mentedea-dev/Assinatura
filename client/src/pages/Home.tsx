@@ -97,7 +97,7 @@ export default function Home() {
 
   // Translation via LLM
   const tMut = trpc.translate.jobTitle.useMutation({
-    onSuccess: (d) => { if (d.translated) setCargoEN(d.translated); setTranslating(false); },
+    onSuccess: (d) => { if (d.translated) { setCargoEN(d.translated); } setTranslating(false); },
     onError: () => { setTranslating(false); toast.error("Erro ao traduzir o cargo."); },
   });
 

@@ -1,33 +1,14 @@
-import express from "express";
-import { createServer } from "http";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-async function startServer() {
-  const app = express();
-  const server = createServer(app);
-
-  // Serve static files from dist/public in production
-  const staticPath =
-    process.env.NODE_ENV === "production"
-      ? path.resolve(__dirname, "public")
-      : path.resolve(__dirname, "..", "dist", "public");
-
-  app.use(express.static(staticPath));
-
-  // Handle client-side routing - serve index.html for all routes
-  app.get("*", (_req, res) => {
-    res.sendFile(path.join(staticPath, "index.html"));
-  });
-
-  const port = process.env.PORT || 3000;
-
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
-  });
-}
-
-startServer().catch(console.error);
+/**
+ * Production entry point.
+ * Re-exports the full server from _core/index.ts, which mounts the tRPC API,
+ * OAuth routes, storage proxy and static file serving.
+ *
+ * The build script compiles server/_core/index.ts into dist/index.js, so this
+ * file must not be used as a standalone server — it exists only to satisfy
+ * editors that expect a top-level server/index.ts.
+ *
+ * If you need to run the server directly, use:
+ *   pnpm dev          → NODE_ENV=development tsx watch server/_core/index.ts
+ *   pnpm start        → NODE_ENV=production node dist/index.js
+ */
+export * from "./_core/index";
