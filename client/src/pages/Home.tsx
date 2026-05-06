@@ -195,7 +195,6 @@ export default function Home() {
     const dpt = cargoPT || "[Cargo]";
     const den = cargoEN || "[Position]";
     const df = fixo || "+55 (XX) XXXX-XXXX";
-    const dc = cel || "+55 (XX) XXXXX-XXXX";
     const de = fullEmail || "nome@assistants.com.br";
 
     const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
@@ -216,7 +215,8 @@ export default function Home() {
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:bold;color:#0B1929;line-height:12px;padding:0;border:none;text-transform:uppercase;letter-spacing:0.8px;mso-line-height-rule:exactly;">${dpt}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:normal;color:#6B7B8D;line-height:12px;padding:0 0 8px 0;border:none;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
+      // Linha do celular: omitida quando o usuário não informa o número
+      ...(cel ? [`<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${cel}</td></tr>`] : []),
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
       `<tr><td colspan="2" style="padding:10px 0 0 0;border:none;font-size:1px;line-height:1px;">&nbsp;</td></tr>`,
@@ -244,7 +244,6 @@ export default function Home() {
     const dpt = (cargoPT || "[Cargo]").toUpperCase();
     const den = cargoEN || "[Position]";
     const df = fixo || "+55 (XX) XXXX-XXXX";
-    const dc = cel || "+55 (XX) XXXXX-XXXX";
     const de = fullEmail || "nome@assistants.com.br";
 
     const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
@@ -273,7 +272,8 @@ export default function Home() {
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:bold;color:#0B1929;line-height:12px;padding:0;mso-line-height-rule:exactly;letter-spacing:0.8px;">${dpt}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:normal;color:#6B7B8D;line-height:12px;padding:0 0 8px 0;font-style:italic;mso-line-height-rule:exactly;">${den}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
+      // Linha do celular: omitida quando o usuário não informa o número
+      ...(cel ? [`<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${cel}</td></tr>`] : []),
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
       `<tr><td colspan="2" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
@@ -300,14 +300,14 @@ export default function Home() {
     const dpt = cargoPT || "[Cargo]";
     const den = cargoEN || "[Position]";
     const df = fixo || "+55 (XX) XXXX-XXXX";
-    const dc = cel || "+55 (XX) XXXXX-XXXX";
     const de = fullEmail || "nome@assistants.com.br";
     return [
       `${dn}`,
       `${dpt}`,
       `${den}`,
       `T  ${df}`,
-      `M  ${dc}`,
+      // Linha do celular: omitida quando o usuário não informa o número
+      ...(cel ? [`M  ${cel}`] : []),
       `E  ${de}`,
       ``,
       `ASSISTANTS`,
@@ -366,7 +366,6 @@ export default function Home() {
     const dpt = (cargoPT || "[Cargo]").toUpperCase();
     const den = cargoEN || "[Position]";
     const df = fixo || "+55 (XX) XXXX-XXXX";
-    const dc = cel || "+55 (XX) XXXXX-XXXX";
     const de = fullEmail || "nome@assistants.com.br";
 
     const imgSrc = foto && fotoUrl ? fotoUrl : symbolB64;
@@ -392,7 +391,8 @@ export default function Home() {
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:bold;color:#0B1929;line-height:12px;mso-line-height-rule:exactly;padding:0;letter-spacing:0.8px;">${dpt}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:9px;font-weight:normal;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;padding:0 0 8px 0;font-style:italic;">${den}</td></tr>`,
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="color:#6B7B8D;">T</span>&nbsp;&nbsp;${df}</td></tr>`,
-      `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${dc}</td></tr>`,
+      // Linha do celular: omitida quando o usuário não informa o número
+      ...(cel ? [`<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="color:#6B7B8D;">M</span>&nbsp;&nbsp;${cel}</td></tr>`] : []),
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;mso-line-height-rule:exactly;padding:0;"><span style="color:#6B7B8D;">E</span>&nbsp;&nbsp;<a href="mailto:${de}" style="color:#E67E22;text-decoration:none;">${de}</a></td></tr>`,
       `</table></td></tr>`,
       `<tr><td colspan="2" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
@@ -471,7 +471,6 @@ export default function Home() {
   const dPT = cargoPT || "Cargo em Português";
   const dEN = cargoEN || "Position in English";
   const dFixo = fixo || "+55 (XX) XXXX-XXXX";
-  const dCel = cel || "+55 (XX) XXXXX-XXXX";
   const dEmail = fullEmail || "nome@assistants.com.br";
 
   return (
@@ -718,7 +717,9 @@ export default function Home() {
                               <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 9, fontWeight: 700, color: "#0B1929", lineHeight: "12px", padding: 0, textTransform: "uppercase", letterSpacing: "0.8px", border: "none" }}>{dPT}</td></tr>
                               <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 9, fontWeight: 400, color: "#6B7B8D", lineHeight: "12px", padding: "0 0 8px 0", fontStyle: "italic", border: "none" }}>{translating ? "Translating..." : dEN}</td></tr>
                               <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><span style={{ color: "#6B7B8D" }}>T</span>&nbsp;&nbsp;{dFixo}</td></tr>
-                              <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><span style={{ color: "#6B7B8D" }}>M</span>&nbsp;&nbsp;{dCel}</td></tr>
+                              {cel && (
+                                <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><span style={{ color: "#6B7B8D" }}>M</span>&nbsp;&nbsp;{cel}</td></tr>
+                              )}
                               <tr><td style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 11, color: "#3D4F5F", lineHeight: "17px", padding: 0, border: "none" }}><span style={{ color: "#6B7B8D" }}>E</span>&nbsp;&nbsp;<a href={`mailto:${dEmail}`} style={{ color: "#E67E22", textDecoration: "none" }}>{dEmail}</a></td></tr>
                             </tbody>
                           </table>
