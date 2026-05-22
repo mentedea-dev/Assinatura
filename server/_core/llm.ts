@@ -209,18 +209,10 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () => {
-  if (!ENV.forgeApiUrl || ENV.forgeApiUrl.trim().length === 0) {
-    return "https://forge.manus.im/v1/chat/completions";
-  }
-  // If the base URL already ends with /v1 (or /v1/), append only /chat/completions
-  // to avoid producing a duplicated /v1/v1/chat/completions path.
-  const base = ENV.forgeApiUrl.replace(/\/+$/, "");
-  if (base.endsWith("/v1")) {
-    return `${base}/chat/completions`;
-  }
-  return `${base}/v1/chat/completions`;
-};
+const resolveApiUrl = () =>
+  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
+    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
+    : "https://forge.manus.im/v1/chat/completions";
 
 const assertApiKey = () => {
   if (!ENV.forgeApiKey) {
@@ -304,7 +296,10 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.tool_choice = normalizedToolChoice;
   }
 
-  payload.max_tokens = params.maxTokens || params.max_tokens || 32768;
+  payload.max_tokens = 32768
+  payload.thinking = {
+    "budget_tokens": 128
+  }
 
   const normalizedResponseFormat = normalizeResponseFormat({
     responseFormat,
