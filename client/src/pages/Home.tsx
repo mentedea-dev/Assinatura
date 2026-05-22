@@ -210,9 +210,9 @@ export default function Home() {
       `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       `<tr><td colspan="2" style="padding:0;border:none;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;"><span style="font-weight:bold;">S\u00e3o Paulo</span>&nbsp;&nbsp;${ENDERECO_SP}</td></tr><tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#6B7B8D;line-height:12px;mso-line-height-rule:exactly;padding:2px 0 0 0;"><span style="font-weight:bold;">Bras\u00edlia</span>&nbsp;&nbsp;${ENDERECO_BSB}</td></tr></table></td></tr>`,
       `<tr><td colspan="2" height="6" style="height:6px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      `<tr><td colspan="2" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr>`,
+      `<tr><td colspan="2" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#B0B8C1;line-height:11px;mso-line-height-rule:exactly;width:520px;">${AVISO_PT}</td></tr>`,
       `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      `<tr><td colspan="2" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:7px;color:#B0B8C1;line-height:10px;mso-line-height-rule:exactly;font-style:italic;width:520px;">${AVISO_EN}</td></tr>`,
+      `<tr><td colspan="2" style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:8px;color:#B0B8C1;line-height:11px;mso-line-height-rule:exactly;font-style:italic;width:520px;">${AVISO_EN}</td></tr>`,
       `</table>`,
     ];
 
@@ -541,10 +541,10 @@ export default function Home() {
                           <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 8, color: "#6B7B8D", margin: "2px 0 0 0", lineHeight: "12px" }}><strong>Brasília</strong>&nbsp;&nbsp;{ENDERECO_BSB}</p>
                         </td></tr>
                         <tr><td colSpan={2} style={{ padding: "10px 0 0 0", border: "none" }}>
-                          <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 7, color: "#B0B8C1", margin: 0, lineHeight: "10px", maxWidth: 520 }}>{AVISO_PT}</p>
+                          <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 8, color: "#B0B8C1", margin: 0, lineHeight: "11px", maxWidth: 520 }}>{AVISO_PT}</p>
                         </td></tr>
                         <tr><td colSpan={2} style={{ padding: "4px 0 0 0", border: "none" }}>
-                          <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 7, color: "#B0B8C1", margin: 0, lineHeight: "10px", maxWidth: 520, fontStyle: "italic" }}>{AVISO_EN}</p>
+                          <p style={{ fontFamily: "Calibri, Arial, Helvetica, sans-serif", fontSize: 8, color: "#B0B8C1", margin: 0, lineHeight: "11px", maxWidth: 520, fontStyle: "italic" }}>{AVISO_EN}</p>
                         </td></tr>
                       </tbody>
                     </table>
