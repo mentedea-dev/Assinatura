@@ -1,33 +1,18 @@
-# Project TODO
+# Gerador de Assinatura — Assistants Consulting
 
-- [x] Basic signature generator with form and live preview
-- [x] Two phone fields: landline and mobile
-- [x] Bilingual job title (PT/EN)
-- [x] SP and BSB office addresses
-- [x] Legal disclaimer in footer
-- [x] Photo option for partners/directors
-- [x] Copy to clipboard and download HTML
-- [x] Upgrade to full-stack (server + db + user)
-- [x] Auto-translate job title from PT to EN via LLM (remove manual EN field)
-- [x] Phone mask with auto-formatting (+55 (XX) XXXX-XXXX / XXXXX-XXXX)
-- [x] DDD validation for Brazilian phone numbers
-- [x] Bilingual legal disclaimer (Portuguese + English) in signature footer
-- [x] BUG: Tradução automática do cargo não está funcionando (corrigido - funciona com debounce 800ms)
-- [x] BUG: Máscara de telefone não formata automaticamente os números digitados (corrigido - input aceita dígitos puros, resultado formatado abaixo)
-- [x] Email: domínio @assistants.com.br fixo, colaborador digita apenas o username
-- [x] BUG: Assinatura - foto deve ser circular (não quadrada) — VML para Outlook + CSS border-radius
-- [x] BUG: Assinatura - wordmark ASSISTANTS muito grande, reduzir — de 140px para 90px
-- [x] BUG: Assinatura - linha laranja desproporcional — removida linha horizontal, mantida barra vertical
-- [x] BUG: Assinatura - espaçamento irregular entre elementos — gaps reduzidos para 8px
-- [x] BUG: Assinatura - disclaimer muito grande/visível demais — cor #C8CDD3, 7px
-- [x] BUG: Assinatura - falta barra vertical laranja entre foto e dados — 2px #E67E22
-- [x] MELHORIA: Assinatura - tornar mais compacta e proporcional (referência McKinsey/Bain)
-- [x] BUG CRÍTICO: Assinatura colada no Outlook exibe bordas de tabela visíveis e espaçamento irregular — corrigido com border=0 + imagens Base64 inline + Clipboard API
-- [x] BUG: Botões Copiar e Baixar HTML não funcionam na versão publicada — corrigido: genHTML definido antes de handleCopy/handleDL, Clipboard API com fallback
-- [x] BUG: Botões desabilitados na versão publicada — corrigido: imagens Base64 importadas diretamente de @shared/signatureAssets (sem dependência do servidor/tRPC)
-- [x] BUG: Toast de confirmação não aparece ao copiar — corrigido: removida dependência de next-themes no Sonner, posição alterada para top-center
-- [x] BUG CRÍTICO: Assinatura copiada está desconfigurada e cheia de espaços — corrigido: HTML gerado agora em linha única sem whitespace entre tags (parts.join(''))
-- [x] Remover botão "Copiar assinatura" e código associado (handleCopy, estado copied, toast)
-- [x] Gerar pacote ZIP com arquivo .htm + pasta _files contendo imagens (formato Outlook para assinaturas)
-- [x] Atualizar guia "Como usar" com instruções detalhadas do Outlook clássico para Windows (Win+R, %APPDATA%\Microsoft\Signatures, copiar .htm e _files, Arquivo > Opções > Email > Assinaturas, selecionar como padrão)
-- [x] BUG CRÍTICO: Assinatura desconfigurada no Outlook — corrigido: HTML reescrito com MSO namespaces, bgcolor, explicit widths, .toUpperCase() em vez de text-transform, sem border-radius
+## TODO
+
+- [x] Backend: router de tradução via LLM (translate.jobTitle) com dicionário + fallback LLM
+- [x] Backend: router de geração de HTML inline (signature.buildHTML)
+- [x] Backend: router de geração de ZIP com estrutura Outlook (signature.buildZip)
+- [x] Upload dos assets (símbolo e wordmark) para storage Manus
+- [x] Frontend: layout Big4/Interbrand — header, formulário, preview em tempo real
+- [x] Frontend: campo Nome, Cargo PT, tradução automática para EN
+- [x] Frontend: campos Telefone Fixo e Celular com validação DDD e formatação
+- [x] Frontend: campo E-mail corporativo com sufixo @assistants.com.br
+- [x] Frontend: toggle de foto circular com upload e crop via Canvas
+- [x] Frontend: preview em tempo real da assinatura
+- [x] Frontend: botão "Copiar para Outlook" (HTML inline base64)
+- [x] Frontend: botão "Baixar pacote (.zip)" com estrutura _files
+- [x] Testes vitest para tradução e geração de HTML (29 testes passando)
+- [x] Checkpoint e publicação

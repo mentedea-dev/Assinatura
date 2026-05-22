@@ -113,6 +113,11 @@
   --sidebar-ring: oklch(0.488 0.243 264.376);
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
