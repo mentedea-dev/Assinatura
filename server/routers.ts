@@ -32,7 +32,7 @@ export const appRouter = router({
     jobTitle: publicProcedure
       .input(z.object({ title: z.string().min(1).max(200) }))
       .mutation(async ({ input }) => {
-        // Local dictionary fallback for common actuarial/consulting titles
+        // Local dictionary fallback for common actuarial/consulting titles and departments
         const DICT: Record<string, string> = {
           "atuário": "Actuary",
           "atuária": "Actuary",
@@ -149,19 +149,20 @@ export const appRouter = router({
         // Try dictionary first (instant, no network dependency)
         if (dictMatch) return { translated: dictMatch };
 
-        // Fallback to LLM for titles not in dictionary
+        // Fallback to LLM for any text not in dictionary (titles, departments, or any other text)
         try {
           const response = await invokeLLM({
             messages: [
               {
                 role: "system",
-                content: `You are a certified Portuguese-English translator specialized in actuarial, accounting, financial, and corporate terminology. 
-Translate the given Brazilian Portuguese job title to its standard English equivalent used in the international actuarial and financial consulting industry.
+                content: `You are a certified Portuguese-English translator specialized in actuarial, accounting, financial, and corporate terminology.
+Translate the given Brazilian Portuguese text to its standard English equivalent used in the international actuarial and financial consulting industry.
+The input may be a job title, a department name, a business area, or any other professional text.
 Rules:
-- Return ONLY the translated job title, nothing else
+- Return ONLY the translated text, nothing else
 - Use proper capitalization (Title Case)
-- Use standard international corporate titles (e.g., "Atuário" → "Actuary", "Sócio-Diretor" → "Managing Partner", "Analista Atuarial" → "Actuarial Analyst")
-- If the title contains specialized terms from health insurance, pension funds, or post-employment benefits, use the correct technical English equivalents
+- Use standard international corporate and technical terminology (e.g., "Atuário" → "Actuary", "Sócio-Diretor" → "Managing Partner", "Saúde Suplementar" → "Supplementary Health", "Previdência Complementar" → "Supplementary Pension", "Benefícios Pós-Emprego" → "Post-Employment Benefits")
+- If the text contains specialized terms from health insurance, pension funds, or post-employment benefits, use the correct technical English equivalents
 - Do not add explanations, quotes, or any other text`,
               },
               {
