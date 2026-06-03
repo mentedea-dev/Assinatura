@@ -19,7 +19,7 @@ import {
 
 /* URLs para exibição no preview web (não usadas no HTML exportado) */
 const SYMBOL_URL = "/manus-storage/sig_symbol_dd0e591b.png";
-const WORDMARK_URL = "/manus-storage/sig_wordmark_fc5032b8.png";
+const WORDMARK_URL = "/manus-storage/sig_wordmark_new_aa2894f3.png";
 
 const ENDERECO_SP = "Rua Cláudio Soares, 72 - 8º andar - Pinheiros - São Paulo/SP - CEP: 05422-030";
 const ENDERECO_BSB = "SCS Quadra 9, Ed. Parque Cidade Corporate - Torre C - Bloco C - 10º andar - Brasília/DF - CEP: 70308-200";
@@ -204,7 +204,7 @@ export default function Home() {
       `<tr><td style="font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px;color:#3D4F5F;line-height:17px;padding:0;border:none;mso-line-height-rule:exactly;"><span style="color:#6B7B8D;">E</span>&nbsp;&nbsp;<a href="mailto:${dEmail}" style="color:#E67E22;text-decoration:none;">${dEmail}</a></td></tr>`,
       `</table></td></tr>`,
       `<tr><td colspan="2" height="10" style="height:10px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
-      `<tr><td colspan="2" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="180" height="40" style="display:block;border:0;outline:none;width:180px;height:40px;" /></a></td></tr>`,
+      `<tr><td colspan="2" style="padding:0;border:none;"><a href="https://www.assistants.com.br" target="_blank" style="text-decoration:none;"><img src="${wmSrc}" alt="Assistants Consulting" width="177" height="40" style="display:block;border:0;outline:none;width:177px;height:40px;" /></a></td></tr>`,
       `<tr><td colspan="2" height="8" style="height:8px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
       `<tr><td colspan="2" height="1" style="height:1px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;background-color:#E7E9EB;">&nbsp;</td></tr>`,
       `<tr><td colspan="2" height="4" style="height:4px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr>`,
@@ -276,7 +276,7 @@ export default function Home() {
       <header className="bg-white border-b border-[#E7E9EB] sticky top-0 z-10">
         <div className="container flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
-            <img src={WORDMARK_URL} alt="Assistants Consulting" className="h-7 w-auto" />
+            <img src={WORDMARK_URL} alt="Assistants Consulting" className="h-8 w-auto" />
             <span className="hidden sm:block text-[11px] text-[#B0B8C1] font-medium uppercase tracking-widest border-l border-[#E7E9EB] pl-3">
               Gerador de Assinatura
             </span>
@@ -532,7 +532,7 @@ export default function Home() {
                         </tr>
                         <tr><td colSpan={2} style={{ padding: "10px 0 0 0", border: "none" }}>
                           <a href="https://www.assistants.com.br" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-                            <img src={WORDMARK_URL} alt="Assistants Consulting" width={180} height={40} style={{ display: "block", border: 0, width: 180, height: 40 }} />
+                            <img src={WORDMARK_URL} alt="Assistants Consulting" width={177} height={40} style={{ display: "block", border: 0, width: 177, height: 40 }} />
                           </a>
                         </td></tr>
                         <tr><td colSpan={2} style={{ padding: "8px 0 0 0", borderTop: "1px solid #E7E9EB", borderLeft: "none", borderRight: "none", borderBottom: "none", fontSize: 1, lineHeight: "1px" }}>&nbsp;</td></tr>
