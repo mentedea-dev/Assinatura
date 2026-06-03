@@ -11,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { SIG_SYMBOL_B64, SIG_WORDMARK_B64 } from "@shared/signatureAssets";
 import {
   Upload, Mail, Phone, Briefcase,
   Download, Image, Smartphone, Loader2, Copy, ClipboardCheck, RefreshCw,
@@ -116,6 +115,14 @@ export default function Home() {
   const dFixo = fixo || "+55 (XX) XXXX-XXXX";
   const dEmail = fullEmail || "nome@assistants.com.br";
 
+  // Load signature image assets from server (base64 for Outlook compatibility)
+  const assetsQuery = trpc.assets.signatureImages.useQuery(undefined, {
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+  });
+  const symbolB64 = assetsQuery.data?.symbolB64 || SYMBOL_URL;
+  const wordmarkB64 = assetsQuery.data?.wordmarkB64 || WORDMARK_URL;
+
   // Translation via LLM
   const tMut = trpc.translate.jobTitle.useMutation({
     onSuccess: (d) => {
@@ -182,8 +189,8 @@ export default function Home() {
     const photoSize = 90;
     const symbolSize = 44;
     const sz = hasPhoto ? photoSize : symbolSize;
-    const imgSrc = hasPhoto ? fotoUrl! : (SIG_SYMBOL_B64 || SYMBOL_URL);
-    const wmSrc = SIG_WORDMARK_B64 || WORDMARK_URL;
+    const imgSrc = hasPhoto ? fotoUrl! : symbolB64;
+    const wmSrc = wordmarkB64;
 
     const photoHTML = hasPhoto
       ? `<img src="${imgSrc}" alt="${dNome}" width="${photoSize}" height="${photoSize}" style="display:block;width:${photoSize}px;height:${photoSize}px;border-radius:50%;border:0;outline:none;" />`
@@ -221,7 +228,7 @@ export default function Home() {
 <head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
 <!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]-->
 </head><body style="margin:0;padding:0;">${rows.join('')}</body></html>`;
-  }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto, dNome, dPT, dEN, dFixo, dEmail]);
+  }, [nome, cargoPT, cargoEN, fixo, cel, fullEmail, fotoUrl, foto, dNome, dPT, dEN, dFixo, dEmail, symbolB64, wordmarkB64]);
 
   const handleCopy = useCallback(async () => {
     try {
