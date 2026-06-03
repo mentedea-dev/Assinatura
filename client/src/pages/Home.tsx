@@ -19,7 +19,7 @@ import {
 
 /* URLs para exibição no preview web (não usadas no HTML exportado) */
 const SYMBOL_URL = "/manus-storage/sig_symbol_dd0e591b.png";
-const WORDMARK_URL = "/manus-storage/sig_wordmark_new_aa2894f3.png";
+const WORDMARK_URL = "/manus-storage/sig_wordmark_v2_375c4867.png";
 
 const ENDERECO_SP = "Rua Cláudio Soares, 72 - 8º andar - Pinheiros - São Paulo/SP - CEP: 05422-030";
 const ENDERECO_BSB = "SCS Quadra 9, Ed. Parque Cidade Corporate - Torre C - Bloco C - 10º andar - Brasília/DF - CEP: 70308-200";
